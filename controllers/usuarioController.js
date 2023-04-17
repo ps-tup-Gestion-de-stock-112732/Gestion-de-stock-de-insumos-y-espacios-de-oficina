@@ -25,6 +25,32 @@ const usuarioGet = async (req = request, res = response) =>{
     
 }
 
+const usuarioPost = async (req, res = response) =>{
+
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado} = req.body
+
+    try {
+        const [rows] = await pool.promise().query('INSERT INTO usuario (nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado) VALUES (?,?,?,?,?,?,?,?,?)', 
+        [nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado])
+        res.send({
+            idusuario: rows.insertId,
+            nombre, 
+            apellido, 
+            idempresa, 
+            nro_documento, 
+            email, password, 
+            telefono, 
+            idrol, 
+            estado
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 const usuarioPut = async (req, res = response) =>{
 
     const {id} = req.params
@@ -48,6 +74,29 @@ const usuarioPut = async (req, res = response) =>{
         })
     }
     
+}
+
+const usuarioDelete = async (req, res = response) =>{
+
+    const {id} = req.params
+    const {estado}= req.body
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE usuario SET estado = ? WHERE idusuario = ?', 
+        [estado, id])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'Usuario no encontrado'
+        })
+
+        res.send("eliminado")
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
 }
 
 module.exports = {
