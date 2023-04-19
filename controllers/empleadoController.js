@@ -81,18 +81,18 @@ const empleadoPost = async (req, res = response) =>{
 const empleadoPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol}= req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, idarea, iddireccion}= req.body
 
     const salt = bcryptjs.genSaltSync()
     passwordC = await bcryptjs.hashSync( password, salt)
     
     try {
 
-        const [result] = await pool.promise().query('UPDATE usuario SET nombre = ?, apellido = ?, idempresa = ?, nro_documento = ?, email = ?, password = ?, telefono = ?, idrol = ? WHERE idusuario = ?', 
-        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, id])
+        const [result] = await pool.promise().query('UPDATE usuario SET nombre = ?, apellido = ?, idempresa = ?, nro_documento = ?, email = ?, password = ?, telefono = ?, idrol = ?, idarea = ?, iddireccion = ? WHERE idusuario = ?', 
+        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, idarea, iddireccion, id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
-            message: 'Usuario no encontrado'
+            message: 'Empleado no encontrado'
         })
 
         const [rows] = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ?', [id])

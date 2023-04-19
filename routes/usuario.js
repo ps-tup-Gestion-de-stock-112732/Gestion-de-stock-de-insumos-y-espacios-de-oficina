@@ -31,6 +31,8 @@ router.post('/', [
     usuarioPost)
 
 router.put('/:id', [
+    validatJWT,
+    esRRHHRol,
     check('id').notEmpty().withMessage('El id de usuario es obligatorio').custom( idUsuarioValidacion ),
     check('email').isEmail().withMessage('El email no es valido').custom( emailUpdateValidacion ),
     check('password', 'El password debe contener 4 o mas caracteres').isLength({min:4}),
