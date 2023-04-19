@@ -84,11 +84,56 @@ const idUsuarioValidacion = (value, {req} )=> {
     })
 }
 
+const idEmpleadoValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ? AND idrol = 5', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El empleado ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const areaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM area WHERE idarea = ?', [req.body.idarea], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El area ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const direccionValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM direccion WHERE iddireccion = ?', [req.body.iddireccion], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La direccion ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 module.exports = {
     emailValidacion,
     emailUpdateValidacion,
     empresaValidacion,
     rolValidacion,
     estadoValidacion,
-    idUsuarioValidacion
+    idUsuarioValidacion,
+    areaValidacion,
+    direccionValidacion,
+    idEmpleadoValidacion
 }

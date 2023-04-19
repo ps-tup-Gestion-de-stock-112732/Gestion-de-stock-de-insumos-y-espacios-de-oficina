@@ -4,72 +4,60 @@ CREATE TABLE `gestiondb`.`area` (
   `idarea` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idarea`));
-
-CREATE TABLE `gestiondb`.`barrio` (
-  `idbarrio` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idbarrio`));
-
-CREATE TABLE `gestiondb`.`localidad` (
-  `idlocalidad` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idlocalidad`));
-
-ALTER TABLE `gestiondb`.`localidad` 
-ADD COLUMN `idbarrio` INT NOT NULL AFTER `nombre`,
-ADD INDEX `barrio_fk_idx` (`idbarrio` ASC) VISIBLE;
-;
-ALTER TABLE `gestiondb`.`localidad` 
-ADD CONSTRAINT `barrio_fk`
-  FOREIGN KEY (`idbarrio`)
-  REFERENCES `gestiondb`.`barrio` (`idbarrio`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-CREATE TABLE `gestiondb`.`provincia` (
-  `idprovincia` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idprovincia`));
-
-ALTER TABLE `gestiondb`.`provincia` 
-ADD COLUMN `idlocalidad` INT NOT NULL AFTER `nombre`,
-ADD INDEX `localidad_fk_idx` (`idlocalidad` ASC) VISIBLE;
-;
-ALTER TABLE `gestiondb`.`provincia` 
-ADD CONSTRAINT `localidad_fk`
-  FOREIGN KEY (`idlocalidad`)
-  REFERENCES `gestiondb`.`localidad` (`idlocalidad`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
+  
 CREATE TABLE `gestiondb`.`pais` (
   `idpais` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idpais`));
-
-ALTER TABLE `gestiondb`.`pais` 
-ADD COLUMN `idprovincia` INT NOT NULL AFTER `nombre`,
-ADD INDEX `provincia_pk_idx` (`idprovincia` ASC) VISIBLE;
-;
-ALTER TABLE `gestiondb`.`pais` 
-ADD CONSTRAINT `provincia_pk`
+  
+CREATE TABLE `gestiondb`.`provincia` (
+  `idprovincia` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `idpais` INT NOT NULL,
+  PRIMARY KEY (`idprovincia`),
+  INDEX `pais_fk_idx` (`idpais` ASC) VISIBLE,
+  CONSTRAINT `pais_fk`
+  FOREIGN KEY (`idpais`)
+  REFERENCES `gestiondb`.`pais` (`idpais`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION);
+  
+CREATE TABLE `gestiondb`.`localidad` (
+  `idlocalidad` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `idprovincia` INT NOT NULL,
+  PRIMARY KEY (`idlocalidad`),
+  INDEX `provincia_fk_idx` (`idprovincia` ASC) VISIBLE,
+  CONSTRAINT `provincia_fk`
   FOREIGN KEY (`idprovincia`)
   REFERENCES `gestiondb`.`provincia` (`idprovincia`)
   ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
+  ON UPDATE NO ACTION);
+
+CREATE TABLE `gestiondb`.`barrio` (
+  `idbarrio` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `idlocalidad` INT NOT NULL,
+  PRIMARY KEY (`idbarrio`),
+  INDEX `localidad_fk_idx` (`idlocalidad` ASC) VISIBLE,
+  CONSTRAINT `localidad_fk`
+  FOREIGN KEY (`idlocalidad`)
+  REFERENCES `gestiondb`.`localidad` (`idlocalidad`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION);
 
 CREATE TABLE `gestiondb`.`direccion` (
   `iddireccion` INT NOT NULL AUTO_INCREMENT,
   `calle` VARCHAR(45) NOT NULL,
   `altura` VARCHAR(45) NOT NULL,
-  `idpais` INT NOT NULL,
+  `idbarrio` INT NOT NULL,
   PRIMARY KEY (`iddireccion`),
-  INDEX `pais_fk_idx` (`idpais` ASC) VISIBLE,
-  CONSTRAINT `pais_fk`
-    FOREIGN KEY (`idpais`)
-    REFERENCES `gestiondb`.`pais` (`idpais`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+  INDEX `barrio_fk_idx` (`idbarrio` ASC) VISIBLE,
+  CONSTRAINT `barrio_fk`
+  FOREIGN KEY (`idbarrio`)
+  REFERENCES `gestiondb`.`barrio` (`idbarrio`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION);
 
 CREATE TABLE `gestiondb`.`empresa` (
   `idempresa` INT NOT NULL AUTO_INCREMENT,
@@ -108,10 +96,14 @@ CREATE TABLE `gestiondb`.`usuario` (
   `telefono` INT NOT NULL,
   `idrol` INT NOT NULL,
   `estado` INT NOT NULL,
+  `idarea` INT NULL,
+  `iddireccion` INT NULL,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   PRIMARY KEY (`idusuario`),
   INDEX `empresa_fk_idx` (`idempresa` ASC) VISIBLE,
   INDEX `rol_fk_idx` (`idrol` ASC) VISIBLE,
+  INDEX `area_fk_idx` (`idarea` ASC) VISIBLE,
+  INDEX `direccion_fk_idx` (`iddireccion` ASC) VISIBLE,
   CONSTRAINT `empresa_fk`
     FOREIGN KEY (`idempresa`)
     REFERENCES `gestiondb`.`empresa` (`idempresa`)
@@ -126,27 +118,42 @@ CREATE TABLE `gestiondb`.`usuario` (
     FOREIGN KEY (`estado`)
     REFERENCES `gestiondb`.`estadousuario` (`idestadoUsuario`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `area_fk`
+    FOREIGN KEY (`idarea`)
+    REFERENCES `gestiondb`.`area` (`idarea`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `direccion_usr_fk`
+    FOREIGN KEY (`iddireccion`)
+    REFERENCES `gestiondb`.`direccion` (`iddireccion`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
+INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
+INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('0', 'Inactivo');
 
-INSERT INTO `gestiondb`.`estado-usuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
-INSERT INTO `gestiondb`.`estado-usuario` (`idestadoUsuario`, `descripcion`) VALUES ('2', 'Inactivo');
+INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`) VALUES ('1', 'ventas');
+INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`) VALUES ('2', 'it');
+INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`) VALUES ('3', 'marketing');
 
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('1', 'rrhh');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('2', 'gestion it');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('3', 'ventas');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('4', 'proveedor');
+INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('5', 'empleado');
 
-INSERT INTO `gestiondb`.`barrio` (`idbarrio`, `nombre`) VALUES ('1', 'Centro');
+INSERT INTO `gestiondb`.`pais` (`idpais`, `nombre`) VALUES ('1', 'Argentina');
 
-INSERT INTO `gestiondb`.`localidad` (`idlocalidad`, `nombre`, `idbarrio`) VALUES ('1', 'Cordoba', '1');
+INSERT INTO `gestiondb`.`provincia` (`idprovincia`, `nombre`, `idpais`) VALUES ('1', 'Cordoba', '1');
 
-INSERT INTO `gestiondb`.`provincia` (`idprovincia`, `nombre`, `idlocalidad`) VALUES ('1', 'Cordoba', '1');
+INSERT INTO `gestiondb`.`localidad` (`idlocalidad`, `nombre`, `idprovincia`) VALUES ('1', 'Cordoba', '1');
 
-INSERT INTO `gestiondb`.`pais` (`idpais`, `nombre`, `idprovincia`) VALUES ('1', 'Argentina', '1');
+INSERT INTO `gestiondb`.`barrio` (`idbarrio`, `nombre`, `idlocalidad`) VALUES ('1', 'Centro', '1');
 
-INSERT INTO `gestiondb`.`direccion` (`iddireccion`, `calle`, `altura`, `idpais`) VALUES ('1', 'FELIX FRIAS', '1213', '1');
+
+INSERT INTO `gestiondb`.`direccion` (`iddireccion`, `calle`, `altura`, `idbarrio`) VALUES ('1', 'FELIX FRIAS', '1213', '1');
 
 INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`) VALUES ('1', 'VENEX S.A.', '4459320', '30715473204', '1');
 
