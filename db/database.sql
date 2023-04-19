@@ -90,6 +90,13 @@ CREATE TABLE `gestiondb`.`rol` (
   `nombre` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idrol`));
 
+CREATE TABLE `gestiondb`.`estadousuario` (
+  `idestadoUsuario` INT NOT NULL,
+  `descripcion` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`idestadoUsuario`),
+  UNIQUE INDEX `idestadoUsuario_UNIQUE` (`idestadoUsuario` ASC) VISIBLE,
+  UNIQUE INDEX `descripcion_UNIQUE` (`descripcion` ASC) VISIBLE);
+
 CREATE TABLE `gestiondb`.`usuario` (
   `idusuario` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
@@ -97,10 +104,11 @@ CREATE TABLE `gestiondb`.`usuario` (
   `idempresa` INT NOT NULL,
   `nro_documento` INT NOT NULL,
   `email` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(100) NOT NULL,
   `telefono` INT NOT NULL,
   `idrol` INT NOT NULL,
-  `estado` TINYINT NOT NULL,
+  `estado` INT NOT NULL,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   PRIMARY KEY (`idusuario`),
   INDEX `empresa_fk_idx` (`idempresa` ASC) VISIBLE,
   INDEX `rol_fk_idx` (`idrol` ASC) VISIBLE,
@@ -113,19 +121,22 @@ CREATE TABLE `gestiondb`.`usuario` (
     FOREIGN KEY (`idrol`)
     REFERENCES `gestiondb`.`rol` (`idrol`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `estado_fk`
+    FOREIGN KEY (`estado`)
+    REFERENCES `gestiondb`.`estadousuario` (`idestadoUsuario`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
 
-
-
-
+INSERT INTO `gestiondb`.`estado-usuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
+INSERT INTO `gestiondb`.`estado-usuario` (`idestadoUsuario`, `descripcion`) VALUES ('2', 'Inactivo');
 
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('1', 'rrhh');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('2', 'gestion it');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('3', 'ventas');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('4', 'proveedor');
-
 
 INSERT INTO `gestiondb`.`barrio` (`idbarrio`, `nombre`) VALUES ('1', 'Centro');
 
