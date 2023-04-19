@@ -31,4 +31,12 @@ routerEmpleados.post('/', [
     ],
     empleadoPost)
 
+routerEmpleados.put('/delete/:id',[
+    validatJWT,
+    esRRHHRol,
+    check('id').notEmpty().withMessage('El id de empleado es obligatorio').custom( idEmpleadoValidacion ),
+    validarCampos
+    ],
+    empleadoDelete)
+
 module.exports = routerEmpleados;

@@ -112,18 +112,18 @@ const empleadoDelete = async (req, res = response) =>{
 
     try {
         
-        const [result] = await pool.promise().query('UPDATE usuario SET estado = 2 WHERE idusuario = ?', 
+        const [result] = await pool.promise().query('UPDATE usuario SET estado = 0 WHERE idusuario = ?', 
         [id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
-            message: 'No se pudo actualizar el usuario'
+            message: 'No se pudo actualizar el empleado'
         })
 
-        const usuario = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ?', [id])
-        const usuarioBorrado = usuario[0]
+        const empleado = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ?', [id])
+        const empleadoBorrado = empleado[0]
 
         res.json({
-            usuarioBorrado
+            empleadoBorrado
         })
 
     } catch (error) {
