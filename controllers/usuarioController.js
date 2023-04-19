@@ -91,7 +91,7 @@ const usuarioDelete = async (req, res = response) =>{
 
     try {
         
-        const [result] = await pool.promise().query('UPDATE usuario SET estado = 2 WHERE idusuario = ?', 
+        const [result] = await pool.promise().query('UPDATE usuario SET estado = 0 WHERE idusuario = ?', 
         [id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
