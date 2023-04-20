@@ -127,6 +127,20 @@ const idEmpleadoValidacion = (value, {req} )=> {
     })
 }
 
+const idEmpresaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM empresa WHERE idempresa = ?', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La empresa ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const areaValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM area WHERE idarea = ?', [req.body.idarea], (err, res)=>{
@@ -166,5 +180,6 @@ module.exports = {
     idUsuarioValidacion,
     areaValidacion,
     direccionValidacion,
-    idEmpleadoValidacion
+    idEmpleadoValidacion,
+    idEmpresaValidacion
 }
