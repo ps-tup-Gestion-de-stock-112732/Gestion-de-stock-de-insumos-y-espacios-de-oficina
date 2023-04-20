@@ -1,6 +1,48 @@
 const { response } = require('express')
 const { pool } =require('../db.js')
 
+const empresasGet = async (req = request, res = response) =>{
+
+    let desde = Number(0)
+    let limite = Number(5)
+
+    if (req.query.desde) {
+        desde = Number(req.query.desde)
+    }
+
+    if (req.query.limite) {
+        limite = Number(req.query.limite)
+    }
+
+    try {
+        const [results] = await pool.promise().query('SELECT * FROM empresa WHERE estado = 1 LIMIT ?,?', [desde, limite])
+        res.json(results)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const empresaGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE idempresa IN (SELECT idempresa FROM usuario WHERE idusuario = ?) LIMIT 1', [req.params.id])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Empresa no encontrada'
+        })
+
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 const empresaPost = async (req, res = response) =>{
 
     const {nombre, telefono, cuit, iddireccion} = req.body
@@ -80,6 +122,8 @@ const empresaDelete = async (req, res = response) =>{
 
 
 module.exports = {
+    empresasGet,
+    empresaGet,
     empresaPost,
     empresaPut,
     empresaDelete
