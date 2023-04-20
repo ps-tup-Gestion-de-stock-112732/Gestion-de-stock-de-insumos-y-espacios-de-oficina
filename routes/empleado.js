@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { empleadosGet, empleadoGet, empleadoPost, empleadoPut, empleadoDelete } = require('../controllers/empleadoController');
+const { empleadosGet, empleadoGet, empleadoPost, cargarArchivo, empleadoPut, empleadoDelete } = require('../controllers/empleadoController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { emailValidacion, emailUpdateValidacion, empresaValidacion, rolValidacion, estadoValidacion, idEmpleadoValidacion, areaValidacion, direccionValidacion } = require('../helpers/db-validators');
@@ -32,6 +32,8 @@ routerEmpleados.post('/', [
     validarCampos
     ],
     empleadoPost)
+
+routerEmpleados.post('/importar', cargarArchivo)
 
 routerEmpleados.put('/:id', [
     validatJWT,
