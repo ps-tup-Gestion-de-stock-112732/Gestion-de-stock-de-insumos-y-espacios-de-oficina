@@ -14,6 +14,21 @@ const emailValidacion = (value, {req} )=> {
     })
 }
 
+const cuitValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        const {cuit} = req.body
+        pool.query('SELECT cuit FROM empresa WHERE cuit = ?', [cuit], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length > 0) 
+                reject(new Error(`La empresa ya se encuentra registrada - cuit: ${cuit}`))
+            
+            resolve(true)
+        })
+    })
+}
+
 const emailUpdateValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM usuario WHERE email = ? AND idusuario != ?', [req.body.email, req.params.id], (err, res)=>{
@@ -129,6 +144,7 @@ const direccionValidacion = (value, {req} )=> {
 module.exports = {
     emailValidacion,
     emailUpdateValidacion,
+    cuitValidacion,
     empresaValidacion,
     rolValidacion,
     estadoValidacion,
