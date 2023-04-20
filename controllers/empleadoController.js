@@ -1,6 +1,7 @@
 const { response } = require('express')
 const { pool } =require('../db.js')
 const bcryptjs = require('bcryptjs')
+const { subirArchivo } = require('../helpers/subir-archivo.js')
 
 const empleadosGet = async (req = request, res = response) =>{
 
@@ -46,7 +47,8 @@ const empleadoGet = async (req = request, res = response) =>{
 
 const empleadoPost = async (req, res = response) =>{
 
-    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, estado, idarea, iddireccion} = req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idarea, iddireccion} = req.body
+    const estado =1
     const idrol =5
 
     //Encriptar password
@@ -74,6 +76,59 @@ const empleadoPost = async (req, res = response) =>{
         return res.status(500).json({
             message: 'Algo salio mal'
         })
+    }
+    
+}
+
+const cargarArchivo = async (req, res = response) =>{
+
+    let empleados = []
+
+    if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
+        res.status(400).json({
+            msg: 'No hay archivos que subir'
+        });
+        return;
+    }
+
+    try {
+        
+        const data = await subirArchivo( req.files, ['xlsx'], 'empleados')
+
+        for (const empleado of data) {
+            
+            const estado = 1
+            const idrol = 5
+            let pass = toString(empleado.password)
+
+            //Encriptar password
+            const salt = bcryptjs.genSaltSync()
+            let passwordC = await bcryptjs.hashSync( pass, salt)
+
+            const [rows] = await pool.promise().query('INSERT INTO usuario (nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado, idarea, iddireccion) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
+            [empleado.nombre, empleado.apellido, empleado.idempresa, empleado.nro_documento, empleado.email, passwordC, empleado.telefono, idrol, estado, empleado.idarea, empleado.iddireccion])
+
+            empleados.push({
+                idusuario: rows.insertId,
+                nombre: empleado.nombre, 
+                apellido: empleado.apellido, 
+                idempresa: empleado.idempresa, 
+                nro_documento: empleado.nro_documento, 
+                email: empleado.email,
+                telefono: empleado.telefono, 
+                idrol: empleado.idrol, 
+                estado: empleado.estado, 
+                idarea: empleado.idarea, 
+                iddireccion: empleado.iddireccion, 
+            })
+
+        }
+
+        res.json({empleados})
+
+    } catch (error) {
+
+        res.status(400).json({error})
     }
     
 }
@@ -138,6 +193,7 @@ module.exports = {
     empleadosGet,
     empleadoGet,
     empleadoPost,
+    cargarArchivo,
     empleadoPut,
     empleadoDelete
 }
