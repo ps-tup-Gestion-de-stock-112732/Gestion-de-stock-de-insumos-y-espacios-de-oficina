@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { empresaPost, empresaPut } = require('../controllers/empresaController');
+const { empresaPost, empresaPut, empresaDelete } = require('../controllers/empresaController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { cuitUpdateValidacion, direccionValidacion, cuitValidacion } = require('../helpers/db-validators');
+const { cuitUpdateValidacion, direccionValidacion, cuitValidacion, idEmpresaValidacion } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esRRHHRol } = require('../middlewares/validar-roles');
 
@@ -29,5 +29,13 @@ routerEmpresas.put('/:id', [
     validarCampos
     ],
     empresaPut)
+
+routerEmpresas.put('/delete/:id',[
+    validatJWT,
+    esRRHHRol,
+    check('id').notEmpty().withMessage('El id de empresa es obligatorio').custom( idEmpresaValidacion ),
+    validarCampos
+    ],
+    empresaDelete)
 
 module.exports = routerEmpresas;
