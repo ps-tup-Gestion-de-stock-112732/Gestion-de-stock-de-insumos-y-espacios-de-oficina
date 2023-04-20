@@ -43,6 +43,20 @@ const emailUpdateValidacion = (value, {req} )=> {
     })
 }
 
+const cuitUpdateValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM empresa WHERE cuit = ? AND idempresa != ?', [req.body.cuit, req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length > 0) 
+                reject(new Error('El cuit ingresado ya se encuentra registrado'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const empresaValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM empresa WHERE idempresa = ?', [req.body.idempresa], (err, res)=>{
@@ -145,6 +159,7 @@ module.exports = {
     emailValidacion,
     emailUpdateValidacion,
     cuitValidacion,
+    cuitUpdateValidacion,
     empresaValidacion,
     rolValidacion,
     estadoValidacion,

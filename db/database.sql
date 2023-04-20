@@ -59,20 +59,6 @@ CREATE TABLE `gestiondb`.`direccion` (
   ON DELETE NO ACTION
   ON UPDATE NO ACTION);
 
-CREATE TABLE `gestiondb`.`empresa` (
-  `idempresa` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  `telefono` BIGINT NOT NULL,
-  `cuit` BIGINT NOT NULL,
-  `iddireccion` INT NOT NULL,
-  PRIMARY KEY (`idempresa`),
-  INDEX `direccion_fk_idx` (`iddireccion` ASC) VISIBLE,
-  CONSTRAINT `direccion_fk`
-    FOREIGN KEY (`iddireccion`)
-    REFERENCES `gestiondb`.`direccion` (`iddireccion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
 CREATE TABLE `gestiondb`.`rol` (
   `idrol` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
@@ -84,6 +70,27 @@ CREATE TABLE `gestiondb`.`estadousuario` (
   PRIMARY KEY (`idestadoUsuario`),
   UNIQUE INDEX `idestadoUsuario_UNIQUE` (`idestadoUsuario` ASC) VISIBLE,
   UNIQUE INDEX `descripcion_UNIQUE` (`descripcion` ASC) VISIBLE);
+  
+CREATE TABLE `gestiondb`.`empresa` (
+  `idempresa` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `telefono` BIGINT NOT NULL,
+  `cuit` BIGINT NOT NULL,
+  `iddireccion` INT NOT NULL,
+  `estado` INT NOT NULL,
+  PRIMARY KEY (`idempresa`),
+  INDEX `direccion_fk_idx` (`iddireccion` ASC) VISIBLE,
+  INDEX `estado_fk_idx` (`estado` ASC) VISIBLE,
+  CONSTRAINT `direccion_fk`
+    FOREIGN KEY (`iddireccion`)
+    REFERENCES `gestiondb`.`direccion` (`iddireccion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `estado_usr_fk`
+    FOREIGN KEY (`estado`)
+    REFERENCES `gestiondb`.`estadousuario` (`idestadoUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 CREATE TABLE `gestiondb`.`usuario` (
   `idusuario` INT NOT NULL AUTO_INCREMENT,
@@ -155,6 +162,4 @@ INSERT INTO `gestiondb`.`barrio` (`idbarrio`, `nombre`, `idlocalidad`) VALUES ('
 
 INSERT INTO `gestiondb`.`direccion` (`iddireccion`, `calle`, `altura`, `idbarrio`) VALUES ('1', 'FELIX FRIAS', '1213', '1');
 
-INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`) VALUES ('1', 'VENEX S.A.', '4459320', '30715473204', '1');
-
-INSERT INTO `gestiondb`.`usuario` (`idusuario`, `nombre`, `apellido`, `idempresa`, `nro_documento`, `email`, `password`, `telefono`, `idrol`, `estado`) VALUES ('1', 'Ezequiel', 'Barrale', '1', '36432731', 'ezeqbarrale@gmail.com', '123456', '4830626', '1', '1');
+INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`) VALUES ('1', 'VENEX S.A.', '4459320', '30715473204', '1', '1');
