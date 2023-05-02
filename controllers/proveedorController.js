@@ -52,7 +52,37 @@ const proveedorPut = async (req, res = response) =>{
     
 }
 
+const proveedorDelete = async (req, res = response) =>{
+
+    const id = req.params.id
+    const tipoempresa = 2
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE empresa SET estado = 0 WHERE idempresa = ? AND tipoempresa = ?', 
+        [id, tipoempresa])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar la empresa'
+        })
+
+        const empresa = await pool.promise().query('SELECT * FROM empresa WHERE idempresa = ?', [id])
+        const empresaBorrada = empresa[0]
+
+        res.json({
+            empresaBorrada
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 module.exports = {
     proveedorPost,
-    proveedorPut
+    proveedorPut,
+    proveedorDelete
 }
