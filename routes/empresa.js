@@ -34,9 +34,9 @@ routerEmpresas.post('/', [
 routerEmpresas.put('/:id', [
     validatJWT,
     esRRHHRol,
-    check('nombre', 'El nombre es obligatorio').notEmpty().custom( cuitUpdateValidacion ),
+    check('nombre', 'El nombre es obligatorio').notEmpty(),
     check('telefono', 'El telefono debe contener 7 o mas caracteres').isLength({min:7}),
-    check('cuit', 'El cuit debe contener 11 caracteres').isLength({min:11, max:11}),
+    check('cuit', 'El cuit debe contener 11 caracteres').isLength({min:11, max:11}).custom( cuitUpdateValidacion ),
     check('iddireccion').notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
     validarCampos
     ],
