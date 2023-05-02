@@ -26,6 +26,33 @@ const proveedorPost = async (req, res = response) =>{
     
 }
 
+const proveedorPut = async (req, res = response) =>{
+
+    const {id} = req.params
+    const {nombre, telefono, cuit, iddireccion} = req.body
+    const tipoempresa = 2
+
+    try {
+
+        const [result] = await pool.promise().query('UPDATE empresa SET nombre = ?, telefono = ?, cuit = ?, iddireccion = ? WHERE idempresa = ? AND tipoempresa = ?', 
+        [nombre, telefono, cuit, iddireccion, id, tipoempresa])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'Empresa no encontrada'
+        })
+
+        const [rows] = await pool.promise().query('SELECT * FROM empresa WHERE idempresa = ?', [id])
+
+        res.json(rows[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 module.exports = {
-    proveedorPost
+    proveedorPost,
+    proveedorPut
 }
