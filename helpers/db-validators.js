@@ -129,12 +129,26 @@ const idEmpleadoValidacion = (value, {req} )=> {
 
 const idEmpresaValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
-        pool.query('SELECT * FROM empresa WHERE idempresa = ?', [req.params.id], (err, res)=>{
+        pool.query('SELECT * FROM empresa WHERE idempresa = ? AND tipoempresa = 1', [req.params.id], (err, res)=>{
             if (err) 
                 reject(new Error('Server error'))
 
             if (res.length == 0) 
                 reject(new Error('La empresa ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idProveedorValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM empresa WHERE idempresa = ? AND tipoempresa = 2', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El proveedor ingresado no existe'))
             
             resolve(true)
         })
@@ -210,6 +224,7 @@ module.exports = {
     direccionValidacion,
     idEmpleadoValidacion,
     idEmpresaValidacion,
+    idProveedorValidacion,
     idBarrioValidacion,
     tipoEmpresaValidacion
 }

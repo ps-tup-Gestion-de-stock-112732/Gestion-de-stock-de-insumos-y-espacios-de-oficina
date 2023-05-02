@@ -88,11 +88,12 @@ const empresaPut = async (req, res = response) =>{
 const empresaDelete = async (req, res = response) =>{
 
     const id = req.params.id
+    const tipoempresa = 1
 
     try {
         
-        const [result] = await pool.promise().query('UPDATE empresa SET estado = 0 WHERE idempresa = ?', 
-        [id])
+        const [result] = await pool.promise().query('UPDATE empresa SET estado = 0 WHERE idempresa = ? AND tipoempresa = ?', 
+        [id, tipoempresa])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'No se pudo actualizar la empresa'

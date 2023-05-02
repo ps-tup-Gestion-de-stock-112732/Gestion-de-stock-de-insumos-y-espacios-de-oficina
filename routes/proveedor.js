@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { proveedorPost, proveedorPut } = require('../controllers/proveedorController');
+const { proveedorPost, proveedorPut, proveedorDelete } = require('../controllers/proveedorController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { direccionValidacion, cuitValidacion, cuitUpdateValidacion } = require('../helpers/db-validators');
+const { direccionValidacion, cuitValidacion, cuitUpdateValidacion, idProveedorValidacion } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esProveedorRol } = require('../middlewares/validar-roles');
 
@@ -29,5 +29,13 @@ routerProveedores.put('/:id', [
     validarCampos
     ],
     proveedorPut)
+
+routerProveedores.put('/delete/:id',[
+    validatJWT,
+    esProveedorRol,
+    check('id').notEmpty().withMessage('El id de proveedor es obligatorio').custom( idProveedorValidacion ),
+    validarCampos
+    ],
+    proveedorDelete)
 
 module.exports = routerProveedores;
