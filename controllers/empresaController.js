@@ -3,19 +3,10 @@ const { pool } =require('../db.js')
 
 const empresasGet = async (req = request, res = response) =>{
 
-    let desde = Number(0)
-    let limite = Number(5)
-
-    if (req.query.desde) {
-        desde = Number(req.query.desde)
-    }
-
-    if (req.query.limite) {
-        limite = Number(req.query.limite)
-    }
+    const {tipoempresa} = req.body
 
     try {
-        const [results] = await pool.promise().query('SELECT * FROM empresa WHERE estado = 1 LIMIT ?,?', [desde, limite])
+        const [results] = await pool.promise().query('SELECT * FROM empresa WHERE estado = 1 AND tipoempresa= ? ', [tipoempresa])
         res.json(results)
     } catch (error) {
         return res.status(500).json({
@@ -47,11 +38,12 @@ const empresaPost = async (req, res = response) =>{
 
     const {nombre, telefono, cuit, iddireccion} = req.body
     const estado = 1
+    const tipoempresa = 1
 
     //Guardar en BD
     try {
-        const [rows] = await pool.promise().query('INSERT INTO empresa (nombre, telefono, cuit, iddireccion, estado) VALUES (?,?,?,?,?)', 
-        [nombre, telefono, cuit, iddireccion, estado])
+        const [rows] = await pool.promise().query('INSERT INTO empresa (nombre, telefono, cuit, iddireccion, estado, tipoempresa) VALUES (?,?,?,?,?,?)', 
+        [nombre, telefono, cuit, iddireccion, estado, tipoempresa])
         res.send({
             idempresa: rows.insertId,
             nombre, 

@@ -25,7 +25,6 @@ router.post('/', [
     check('nro_documento', 'El nro_documento debe contener 8 caracteres').isLength({min:8, max:8}),
     check('telefono', 'El telefono debe contener 7 o mas caracteres').isLength({min:7}),
     check('idrol').notEmpty().withMessage('El idrol es obligatorio').custom( rolValidacion ),
-    check('estado').notEmpty().withMessage('El estado es obligatorio').custom( estadoValidacion ),
     validarCampos
     ],
     usuarioPost)

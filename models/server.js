@@ -11,6 +11,10 @@ class Server{
         this.usuariosPath = '/api/usuarios';
         this.empleadosPath = '/api/empleados';
         this.empresasPath = '/api/empresas';
+        this.rolesPath = '/api/roles';
+        this.areaPath = '/api/areas';
+        this.direccionPath = '/api/direcciones';
+        this.proveedorPath = '/api/proveedores';
         
         //Middlewares
         this.middlewares();
@@ -41,6 +45,10 @@ class Server{
         this.app.use(this.usuariosPath, require('../routes/usuario'))
         this.app.use(this.empleadosPath, require('../routes/empleado'))
         this.app.use(this.empresasPath, require('../routes/empresa'))
+        this.app.use(this.rolesPath, require('../routes/roles'))
+        this.app.use(this.areaPath, require('../routes/areas'))
+        this.app.use(this.direccionPath, require('../routes/direcciones'))
+        this.app.use(this.proveedorPath, require('../routes/proveedor'))
 
         this.app.use((req, res, next)=>{
             res.status(404).json({
