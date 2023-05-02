@@ -28,11 +28,12 @@ const usuarioGet = async (req = request, res = response) =>{
 
 const usuarioPost = async (req, res = response) =>{
 
-    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado} = req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol} = req.body
 
     //Encriptar password
     const salt = bcryptjs.genSaltSync()
     let passwordC = await bcryptjs.hashSync( password, salt)
+    let estado = 1
 
     //Guardar en BD
     try {

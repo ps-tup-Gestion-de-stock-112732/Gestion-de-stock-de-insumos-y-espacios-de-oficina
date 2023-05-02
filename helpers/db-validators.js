@@ -141,6 +141,20 @@ const idEmpresaValidacion = (value, {req} )=> {
     })
 }
 
+const idBarrioValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM barrio WHERE idbarrio = ?', [req.body.idbarrio], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El barrio ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const areaValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM area WHERE idarea = ?', [req.body.idarea], (err, res)=>{
@@ -169,6 +183,20 @@ const direccionValidacion = (value, {req} )=> {
     })
 }
 
+const tipoEmpresaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM tipoempresa WHERE idtipoempresa = ?', [req.body.tipoempresa], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El tipo de empresa ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 module.exports = {
     emailValidacion,
     emailUpdateValidacion,
@@ -181,5 +209,7 @@ module.exports = {
     areaValidacion,
     direccionValidacion,
     idEmpleadoValidacion,
-    idEmpresaValidacion
+    idEmpresaValidacion,
+    idBarrioValidacion,
+    tipoEmpresaValidacion
 }

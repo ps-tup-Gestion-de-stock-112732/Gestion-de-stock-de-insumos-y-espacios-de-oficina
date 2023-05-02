@@ -70,6 +70,13 @@ CREATE TABLE `gestiondb`.`estadousuario` (
   PRIMARY KEY (`idestadoUsuario`),
   UNIQUE INDEX `idestadoUsuario_UNIQUE` (`idestadoUsuario` ASC) VISIBLE,
   UNIQUE INDEX `descripcion_UNIQUE` (`descripcion` ASC) VISIBLE);
+
+
+CREATE TABLE `gestiondb`.`tipoempresa` (
+  `idtipoempresa` INT NOT NULL AUTO_INCREMENT,
+  `descripcion` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idtipoempresa`));
+
   
 CREATE TABLE `gestiondb`.`empresa` (
   `idempresa` INT NOT NULL AUTO_INCREMENT,
@@ -78,9 +85,11 @@ CREATE TABLE `gestiondb`.`empresa` (
   `cuit` BIGINT NOT NULL,
   `iddireccion` INT NOT NULL,
   `estado` INT NOT NULL,
+  `tipoempresa` INT NOT NULL,
   PRIMARY KEY (`idempresa`),
   INDEX `direccion_fk_idx` (`iddireccion` ASC) VISIBLE,
   INDEX `estado_fk_idx` (`estado` ASC) VISIBLE,
+  INDEX `tipoempresa_fk_idx` (`tipoempresa` ASC) VISIBLE,
   CONSTRAINT `direccion_fk`
     FOREIGN KEY (`iddireccion`)
     REFERENCES `gestiondb`.`direccion` (`iddireccion`)
@@ -89,6 +98,11 @@ CREATE TABLE `gestiondb`.`empresa` (
   CONSTRAINT `estado_usr_fk`
     FOREIGN KEY (`estado`)
     REFERENCES `gestiondb`.`estadousuario` (`idestadoUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `tipoempresa_fk`
+    FOREIGN KEY (`tipoempresa`)
+    REFERENCES `gestiondb`.`tipoempresa` (`idtipoempresa`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
@@ -138,6 +152,8 @@ CREATE TABLE `gestiondb`.`usuario` (
     ON UPDATE NO ACTION);
 
 
+
+
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('0', 'Inactivo');
 
@@ -159,7 +175,10 @@ INSERT INTO `gestiondb`.`localidad` (`idlocalidad`, `nombre`, `idprovincia`) VAL
 
 INSERT INTO `gestiondb`.`barrio` (`idbarrio`, `nombre`, `idlocalidad`) VALUES ('1', 'Centro', '1');
 
-
 INSERT INTO `gestiondb`.`direccion` (`iddireccion`, `calle`, `altura`, `idbarrio`) VALUES ('1', 'FELIX FRIAS', '1213', '1');
 
-INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`) VALUES ('1', 'VENEX S.A.', '4459320', '30715473204', '1', '1');
+INSERT INTO `gestiondb`.`tipoempresa` (`idtipoempresa`, `descripcion`) VALUES ('1', 'empresa');
+INSERT INTO `gestiondb`.`tipoempresa` (`idtipoempresa`, `descripcion`) VALUES ('2', 'proveedor');
+
+INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'DICSYS S.A.', '4839201', '28715473204', '1', '1', '1');
+INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('2', 'VENEX S.A.', '4459320', '30715473204', '1', '1', '2');
