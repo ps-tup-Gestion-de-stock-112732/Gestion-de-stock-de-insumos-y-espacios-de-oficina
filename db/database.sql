@@ -110,15 +110,16 @@ CREATE TABLE `gestiondb`.`usuario` (
   `idusuario` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
   `apellido` VARCHAR(45) NOT NULL,
-  `idempresa` INT NOT NULL,
+  `idempresa` INT NULL,
   `nro_documento` INT NOT NULL,
   `email` VARCHAR(45) NOT NULL,
   `password` VARCHAR(100) NOT NULL,
-  `telefono` INT NOT NULL,
+  `telefono` BIGINT NOT NULL,
   `idrol` INT NOT NULL,
   `estado` INT NOT NULL,
   `idarea` INT NULL,
   `iddireccion` INT NULL,
+  `esAdmin` TINYINT NOT NULL,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   PRIMARY KEY (`idusuario`),
   INDEX `empresa_fk_idx` (`idempresa` ASC) VISIBLE,
@@ -181,4 +182,9 @@ INSERT INTO `gestiondb`.`tipoempresa` (`idtipoempresa`, `descripcion`) VALUES ('
 INSERT INTO `gestiondb`.`tipoempresa` (`idtipoempresa`, `descripcion`) VALUES ('2', 'proveedor');
 
 INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'DICSYS S.A.', '4839201', '28715473204', '1', '1', '1');
+/* INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'MERCADO LIBRE', '4528163', '29397143235', '5', '1', '1');
+INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'DESPEGAR.COM', '4673014', '23739380879', '8', '1', '1');
+INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'GLOBANT', '42810945', '23093590996', '10', '1', '1');
+INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'OLX', '4283052', '27125378143', '4', '1', '1');
+ */
 INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('2', 'VENEX S.A.', '4459320', '30715473204', '1', '1', '2');

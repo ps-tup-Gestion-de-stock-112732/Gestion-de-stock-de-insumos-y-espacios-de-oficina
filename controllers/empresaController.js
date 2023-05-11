@@ -19,13 +19,51 @@ const empresasGet = async (req = request, res = response) =>{
 const empresaGet = async (req = request, res = response) =>{
 
     try {
-        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE idempresa IN (SELECT idempresa FROM usuario WHERE idusuario = ?) LIMIT 1', [req.params.id])
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE idempresa = ? LIMIT 1', [req.params.id])
 
         if (result.length <= 0) return res.status(404).json({
             message: 'Empresa no encontrada'
         })
 
         res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
+const empresaXUsuarioGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE idempresa IN (SELECT idempresa FROM usuario WHERE idusuario = ?) LIMIT 1', [req.body.idusuario])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Empresa no encontrada'
+        })
+
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
+const empresaXNombreGet = async (req = request, res = response) =>{
+
+    const {nombre, tipoempresa} = req.body
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE nombre LIKE ? AND tipoempresa = ?', ['%'+nombre+'%', tipoempresa])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Sin coincidencias para la empresa: '+nombre
+        })
+
+        res.json(result)
     } catch (error) {
         return res.status(500).json({
             message: 'Algo salio mal'
@@ -118,7 +156,9 @@ const empresaDelete = async (req, res = response) =>{
 module.exports = {
     empresasGet,
     empresaGet,
+    empresaXUsuarioGet,
     empresaPost,
     empresaPut,
-    empresaDelete
+    empresaDelete,
+    empresaXNombreGet
 }
