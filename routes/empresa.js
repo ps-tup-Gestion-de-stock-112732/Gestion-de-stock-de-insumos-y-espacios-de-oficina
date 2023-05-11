@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { empresasGet, empresaGet, empresaPost, empresaPut, empresaDelete } = require('../controllers/empresaController');
+const { empresasGet, empresaGet, empresaXUsuarioGet, empresaPost, empresaPut, empresaDelete, empresaXNombreGet } = require('../controllers/empresaController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { idEmpleadoValidacion, cuitUpdateValidacion, direccionValidacion, tipoEmpresaValidacion, cuitValidacion, idEmpresaValidacion } = require('../helpers/db-validators');
+const { idUsuarioValidacion, cuitUpdateValidacion, direccionValidacion, tipoEmpresaValidacion, cuitValidacion, idEmpresaValidacion } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esRRHHRol } = require('../middlewares/validar-roles');
 
@@ -14,11 +14,20 @@ routerEmpresas.post('/all', [
     ],
     empresasGet )
 
-routerEmpresas.get('/:id', [
-    check('id').notEmpty().withMessage('El id de empleado es obligatorio').custom( idEmpleadoValidacion ),
+routerEmpresas.get('/:id', empresaGet)
+
+routerEmpresas.post('/usuario', [
+    check('idusuario').notEmpty().withMessage('El id de usuario es obligatorio').custom( idUsuarioValidacion ),
     validarCampos
     ],
-    empresaGet)
+    empresaXUsuarioGet)
+
+routerEmpresas.post('/nombre', [
+    check('nombre').notEmpty().withMessage('El nombre de empresa es obligatorio'),
+    check('tipoempresa').notEmpty().withMessage('El tipo de empresa es obligatorio').custom( tipoEmpresaValidacion ),
+    validarCampos
+    ],
+    empresaXNombreGet)
 
 routerEmpresas.post('/', [
     validatJWT,

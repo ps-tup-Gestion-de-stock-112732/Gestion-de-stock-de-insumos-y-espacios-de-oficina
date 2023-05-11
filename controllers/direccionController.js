@@ -59,6 +59,24 @@ const barriosGet = async (req = request, res = response) =>{
 
 }
 
+const direccionGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM direccion WHERE iddireccion = ?', [req.params.id])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Direccion no encontrada'
+        })
+
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 const direccionPost = async (req, res = response) =>{
 
     const {calle, altura, idbarrio} = req.body
@@ -81,10 +99,67 @@ const direccionPost = async (req, res = response) =>{
     
 }
 
+const paisGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM pais WHERE idpais = ?', [req.params.id])
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const provinciaGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM provincia WHERE idprovincia = ?', [req.params.id])
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const localidadGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM localidad WHERE idlocalidad = ?', [req.params.id])
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const barrioGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM barrio WHERE idbarrio = ?', [req.params.id])
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 module.exports = {
     paisesGet,
     provinciasGet,
     localidadesGet,
     barriosGet,
-    direccionPost
+    direccionGet,
+    direccionPost,
+    paisGet,
+    provinciaGet,
+    localidadGet,
+    barrioGet
 }

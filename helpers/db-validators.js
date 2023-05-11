@@ -14,6 +14,20 @@ const emailValidacion = (value, {req} )=> {
     })
 }
 
+const documentoValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT idusuario FROM usuario WHERE nro_documento = ?', [req.body.nro_documento], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length > 0) 
+                reject(new Error('El numero de documento ingresado ya se encuentra registrado'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const cuitValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         const {cuit} = req.body
@@ -37,6 +51,20 @@ const emailUpdateValidacion = (value, {req} )=> {
 
             if (res.length > 0) 
                 reject(new Error('El email ingresado ya se encuentra registrado'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const documentoUpdateValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE nro_documento = ? AND idusuario != ?', [req.body.nro_documento, req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length > 0)
+                reject(new Error('El número de documento ingresado ya se encuentra registrado'))
             
             resolve(true)
         })
@@ -226,5 +254,7 @@ module.exports = {
     idEmpresaValidacion,
     idProveedorValidacion,
     idBarrioValidacion,
-    tipoEmpresaValidacion
+    tipoEmpresaValidacion,
+    documentoValidacion,
+    documentoUpdateValidacion
 }
