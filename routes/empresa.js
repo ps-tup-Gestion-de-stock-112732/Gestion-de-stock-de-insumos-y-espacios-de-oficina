@@ -33,19 +33,20 @@ routerEmpresas.post('/', [
     validatJWT,
     esRRHHRol,
     check('nombre', 'El nombre es obligatorio').notEmpty().custom( cuitValidacion ),
-    check('telefono', 'El telefono debe contener 7 o mas caracteres').isLength({min:7}),
-    check('cuit', 'El cuit debe contener 11 caracteres').isLength({min:11, max:11}),
+    check('telefono', 'El telefono debe contener 7 o mas caracteres').notEmpty().isLength({min:7}),
+    check('cuit', 'El cuit debe contener 11 caracteres').notEmpty().isLength({min:11, max:11}),
     check('iddireccion').notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
     validarCampos
     ],
     empresaPost)
 
-routerEmpresas.put('/:id', [
+routerEmpresas.patch('/:id', [
     validatJWT,
     esRRHHRol,
-    check('nombre', 'El nombre es obligatorio').notEmpty(),
-    check('telefono', 'El telefono debe contener 7 o mas caracteres').isLength({min:7}),
-    check('cuit', 'El cuit debe contener 11 caracteres').isLength({min:11, max:11}).custom( cuitUpdateValidacion ),
+    check('id').notEmpty().withMessage('El id de empresa es obligatorio').custom( idEmpresaValidacion ),
+    check('nombre', 'El nombre es obligatorio').optional().notEmpty(),
+    check('telefono', 'El telefono debe contener 7 o mas caracteres').optional().notEmpty().isLength({min:7}),
+    check('cuit', 'El cuit debe contener 11 caracteres').optional().notEmpty().isLength({min:11, max:11}).custom( cuitUpdateValidacion ),
     check('iddireccion').notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
     validarCampos
     ],

@@ -113,6 +113,20 @@ const rolValidacion = (value, {req} )=> {
     })
 }
 
+const esAdminValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM estadousuario WHERE idestadoUsuario = ?', [req.body.esAdmin], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El indicador esAdmin ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const estadoValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM estadousuario WHERE idestadoUsuario = ?', [req.body.estado], (err, res)=>{
@@ -135,6 +149,20 @@ const idUsuarioValidacion = (value, {req} )=> {
 
             if (res.length == 0) 
                 reject(new Error('El usuario ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idDireccionValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM direccion WHERE iddireccion = ?', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La direccion ingresada no existe'))
             
             resolve(true)
         })
@@ -256,5 +284,7 @@ module.exports = {
     idBarrioValidacion,
     tipoEmpresaValidacion,
     documentoValidacion,
-    documentoUpdateValidacion
+    documentoUpdateValidacion,
+    esAdminValidacion,
+    idDireccionValidacion
 }
