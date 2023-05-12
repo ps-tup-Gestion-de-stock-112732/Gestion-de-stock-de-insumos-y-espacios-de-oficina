@@ -87,7 +87,9 @@ const empresaPost = async (req, res = response) =>{
             nombre, 
             telefono, 
             cuit,
-            iddireccion
+            iddireccion,
+            estado,
+            tipoempresa
         })
     } catch (error) {
         return res.status(500).json({
@@ -105,7 +107,7 @@ const empresaPut = async (req, res = response) =>{
     
     try {
 
-        const [result] = await pool.promise().query('UPDATE empresa SET nombre = ?, telefono = ?, cuit = ?, iddireccion = ? WHERE idempresa = ? AND tipoempresa = ?', 
+        const [result] = await pool.promise().query('UPDATE empresa SET nombre = IFNULL(?,nombre), telefono = IFNULL(?,telefono), cuit = IFNULL(?,cuit), iddireccion = IFNULL(?,iddireccion) WHERE idempresa = ? AND tipoempresa = ?', 
         [nombre, telefono, cuit, iddireccion, id, tipoempresa])
 
         if (result.affectedRows <= 0) return res.status(404).json({

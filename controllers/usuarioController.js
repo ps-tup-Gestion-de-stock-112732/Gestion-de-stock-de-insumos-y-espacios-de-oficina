@@ -60,15 +60,20 @@ const usuarioPost = async (req, res = response) =>{
 const usuarioPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol}= req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, esAdmin}= req.body
 
-    const salt = bcryptjs.genSaltSync()
-    passwordC = await bcryptjs.hashSync( password, salt)
+    passwordC = undefined
+    
+    if (password != undefined) {
+        const salt = bcryptjs.genSaltSync()
+        passwordC = await bcryptjs.hashSync( password, salt)
+    }
+    
     
     try {
 
-        const [result] = await pool.promise().query('UPDATE usuario SET nombre = ?, apellido = ?, idempresa = ?, nro_documento = ?, email = ?, password = ?, telefono = ?, idrol = ? WHERE idusuario = ?', 
-        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, id])
+        const [result] = await pool.promise().query('UPDATE usuario SET nombre = IFNULL(?,nombre), apellido = IFNULL(?,apellido), idempresa = IFNULL(?,idempresa), nro_documento = IFNULL(?,nro_documento), email = IFNULL(?,email), password = IFNULL(?,password), telefono = IFNULL(?,telefono), idrol = IFNULL(?,idrol), esAdmin = IFNULL(?,esAdmin) WHERE idusuario = ?', 
+        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, esAdmin, id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Usuario no encontrado'
@@ -113,10 +118,40 @@ const usuarioDelete = async (req, res = response) =>{
 
 }
 
+
+const usuarioDesvincular = async (req, res = response) =>{
+
+    const id = req.params.id
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE usuario SET idempresa = NULL WHERE idusuario = ?', 
+        [id])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar el usuario'
+        })
+
+        const usuario = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ?', [id])
+        const usuarioSinEmpresa = usuario[0]
+
+        res.json({
+            usuarioSinEmpresa
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 module.exports = {
     usuariosGet,
     usuarioGet,
     usuarioPost,
     usuarioPut,
-    usuarioDelete
+    usuarioDelete,
+    usuarioDesvincular
 }

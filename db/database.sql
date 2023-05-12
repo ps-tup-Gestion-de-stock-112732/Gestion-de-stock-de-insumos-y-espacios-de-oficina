@@ -119,7 +119,7 @@ CREATE TABLE `gestiondb`.`usuario` (
   `estado` INT NOT NULL,
   `idarea` INT NULL,
   `iddireccion` INT NULL,
-  `esAdmin` TINYINT NOT NULL,
+  `esAdmin` TINYINT NULL DEFAULT 0,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   PRIMARY KEY (`idusuario`),
   INDEX `empresa_fk_idx` (`idempresa` ASC) VISIBLE,

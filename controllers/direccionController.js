@@ -151,6 +151,31 @@ const barrioGet = async (req = request, res = response) =>{
 
 }
 
+const direccionPut = async (req, res = response) =>{
+
+    const {id} = req.params
+    const {calle, altura, idbarrio} = req.body
+    
+    try {
+
+        const [result] = await pool.promise().query('UPDATE direccion SET calle = IFNULL(?,calle), altura = IFNULL(?,altura), idbarrio = IFNULL(?,idbarrio) WHERE iddireccion = ?', 
+        [calle, altura, idbarrio, id])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'Direccion no encontrada'
+        })
+
+        const [rows] = await pool.promise().query('SELECT * FROM direccion WHERE iddireccion = ?', [id])
+
+        res.json(rows[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 module.exports = {
     paisesGet,
     provinciasGet,
@@ -161,5 +186,6 @@ module.exports = {
     paisGet,
     provinciaGet,
     localidadGet,
-    barrioGet
+    barrioGet,
+    direccionPut
 }
