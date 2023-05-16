@@ -1,22 +1,59 @@
 const { response } = require('express')
 const { pool } =require('../db.js')
 
+const proveedoresGet = async (req = request, res = response) =>{
+
+    const {tipoempresa} = req.body
+
+    try {
+        const [results] = await pool.promise().query('SELECT * FROM empresa WHERE estado = 1 AND tipoempresa= ? ', [tipoempresa])
+        res.json(results)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const proveedorXNombreGet = async (req = request, res = response) =>{
+
+    const {nombre, tipoempresa} = req.body
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE nombre LIKE ? AND tipoempresa = ?', ['%'+nombre+'%', tipoempresa])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Sin coincidencias para el proveedor: '+nombre
+        })
+
+        res.json(result)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
+
 const proveedorPost = async (req, res = response) =>{
 
-    const {nombre, telefono, cuit, iddireccion} = req.body
+    const {nombre, telefono, cuit, iddireccion, idadmin} = req.body
     const estado = 1
     const tipoempresa = 2
 
     //Guardar en BD
     try {
-        const [rows] = await pool.promise().query('INSERT INTO empresa (nombre, telefono, cuit, iddireccion, estado, tipoempresa) VALUES (?,?,?,?,?,?)', 
-        [nombre, telefono, cuit, iddireccion, estado, tipoempresa])
+        const [rows] = await pool.promise().query('INSERT INTO empresa (nombre, telefono, cuit, iddireccion, estado, tipoempresa, idadmin) VALUES (?,?,?,?,?,?,?)', 
+        [nombre, telefono, cuit, iddireccion, estado, tipoempresa, idadmin])
         res.send({
             idproveedor: rows.insertId,
             nombre, 
             telefono, 
             cuit,
-            iddireccion
+            iddireccion,
+            idadmin
         })
     } catch (error) {
         return res.status(500).json({
@@ -82,7 +119,9 @@ const proveedorDelete = async (req, res = response) =>{
 }
 
 module.exports = {
+    proveedoresGet,
     proveedorPost,
     proveedorPut,
-    proveedorDelete
+    proveedorDelete,
+    proveedorXNombreGet
 }

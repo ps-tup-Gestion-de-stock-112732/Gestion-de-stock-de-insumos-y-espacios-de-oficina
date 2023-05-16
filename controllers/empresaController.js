@@ -74,14 +74,14 @@ const empresaXNombreGet = async (req = request, res = response) =>{
 
 const empresaPost = async (req, res = response) =>{
 
-    const {nombre, telefono, cuit, iddireccion} = req.body
+    const {nombre, telefono, cuit, iddireccion, idadmin} = req.body
     const estado = 1
     const tipoempresa = 1
 
     //Guardar en BD
     try {
-        const [rows] = await pool.promise().query('INSERT INTO empresa (nombre, telefono, cuit, iddireccion, estado, tipoempresa) VALUES (?,?,?,?,?,?)', 
-        [nombre, telefono, cuit, iddireccion, estado, tipoempresa])
+        const [rows] = await pool.promise().query('INSERT INTO empresa (nombre, telefono, cuit, iddireccion, estado, tipoempresa, idadmin) VALUES (?,?,?,?,?,?,?)', 
+        [nombre, telefono, cuit, iddireccion, estado, tipoempresa, idadmin])
         res.send({
             idempresa: rows.insertId,
             nombre, 
@@ -89,7 +89,8 @@ const empresaPost = async (req, res = response) =>{
             cuit,
             iddireccion,
             estado,
-            tipoempresa
+            tipoempresa,
+            idadmin
         })
     } catch (error) {
         return res.status(500).json({
@@ -102,13 +103,13 @@ const empresaPost = async (req, res = response) =>{
 const empresaPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {nombre, telefono, cuit, iddireccion} = req.body
+    const {nombre, telefono, cuit, iddireccion, idadmin} = req.body
     const tipoempresa = 1
     
     try {
 
-        const [result] = await pool.promise().query('UPDATE empresa SET nombre = IFNULL(?,nombre), telefono = IFNULL(?,telefono), cuit = IFNULL(?,cuit), iddireccion = IFNULL(?,iddireccion) WHERE idempresa = ? AND tipoempresa = ?', 
-        [nombre, telefono, cuit, iddireccion, id, tipoempresa])
+        const [result] = await pool.promise().query('UPDATE empresa SET nombre = IFNULL(?,nombre), telefono = IFNULL(?,telefono), cuit = IFNULL(?,cuit), iddireccion = IFNULL(?,iddireccion), idadmin = IFNULL(?,idadmin) WHERE idempresa = ? AND tipoempresa = ?', 
+        [nombre, telefono, cuit, iddireccion, id, tipoempresa, idadmin])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Empresa no encontrada'

@@ -1,10 +1,5 @@
 CREATE DATABASE IF NOT EXISTS gestiondb;
 
-CREATE TABLE `gestiondb`.`area` (
-  `idarea` INT NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idarea`));
-  
 CREATE TABLE `gestiondb`.`pais` (
   `idpais` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
@@ -86,6 +81,7 @@ CREATE TABLE `gestiondb`.`empresa` (
   `iddireccion` INT NOT NULL,
   `estado` INT NOT NULL,
   `tipoempresa` INT NOT NULL,
+  `idadmin` INT NULL DEFAULT 0,
   PRIMARY KEY (`idempresa`),
   INDEX `direccion_fk_idx` (`iddireccion` ASC) VISIBLE,
   INDEX `estado_fk_idx` (`estado` ASC) VISIBLE,
@@ -106,6 +102,19 @@ CREATE TABLE `gestiondb`.`empresa` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+CREATE TABLE `gestiondb`.`area` (
+  `idarea` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `idempresa` INT NOT NULL,
+  `estado` INT NOT NULL,
+  PRIMARY KEY (`idarea`),
+  INDEX `empresa_fk_idx` (`idempresa` ASC) VISIBLE,
+  CONSTRAINT `empresa_area_fk`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
 CREATE TABLE `gestiondb`.`usuario` (
   `idusuario` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
@@ -119,7 +128,6 @@ CREATE TABLE `gestiondb`.`usuario` (
   `estado` INT NOT NULL,
   `idarea` INT NULL,
   `iddireccion` INT NULL,
-  `esAdmin` TINYINT NULL DEFAULT 0,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   PRIMARY KEY (`idusuario`),
   INDEX `empresa_fk_idx` (`idempresa` ASC) VISIBLE,
@@ -153,14 +161,8 @@ CREATE TABLE `gestiondb`.`usuario` (
     ON UPDATE NO ACTION);
 
 
-
-
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('0', 'Inactivo');
-
-INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`) VALUES ('1', 'ventas');
-INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`) VALUES ('2', 'it');
-INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`) VALUES ('3', 'marketing');
 
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('1', 'rrhh');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('2', 'gestion it');
@@ -187,4 +189,9 @@ INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `i
 INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'GLOBANT', '42810945', '23093590996', '10', '1', '1');
 INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('1', 'OLX', '4283052', '27125378143', '4', '1', '1');
  */
+
+INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`, `idempresa`) VALUES ('1', 'ventas','1');
+INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`, `idempresa`) VALUES ('2', 'it', '1');
+INSERT INTO `gestiondb`.`area` (`idarea`, `nombre`, `idempresa`) VALUES ('3', 'marketing', '1');
+
 INSERT INTO `gestiondb`.`empresa` (`idempresa`, `nombre`, `telefono`, `cuit`, `iddireccion`, `estado`, `tipoempresa`) VALUES ('2', 'VENEX S.A.', '4459320', '30715473204', '1', '1', '2');
