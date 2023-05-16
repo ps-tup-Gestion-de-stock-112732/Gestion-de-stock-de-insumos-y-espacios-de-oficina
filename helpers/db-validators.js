@@ -1,7 +1,9 @@
 const { pool } =require('../db.js')
 
 const emailValidacion = (value, {req} )=> {
+    
     return new Promise((resolve, reject) => {
+
         pool.query('SELECT idusuario FROM usuario WHERE email = ?', [req.body.email], (err, res)=>{
             if (err) 
                 reject(new Error('Server error'))
@@ -155,6 +157,34 @@ const idUsuarioValidacion = (value, {req} )=> {
     })
 }
 
+const idAdminValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ?', [req.body.idadmin], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El usuario ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idRolValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM rol WHERE idrol = ?', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El rol ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idDireccionValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM direccion WHERE iddireccion = ?', [req.params.id], (err, res)=>{
@@ -172,6 +202,20 @@ const idDireccionValidacion = (value, {req} )=> {
 const idEmpleadoValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM usuario WHERE idusuario = ? AND idrol = 5', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El empleado ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idAreaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM area WHERE idarea = ?', [req.params.id], (err, res)=>{
             if (err) 
                 reject(new Error('Server error'))
 
@@ -286,5 +330,8 @@ module.exports = {
     documentoValidacion,
     documentoUpdateValidacion,
     esAdminValidacion,
-    idDireccionValidacion
+    idDireccionValidacion,
+    idRolValidacion,
+    idAreaValidacion,
+    idAdminValidacion
 }

@@ -60,7 +60,7 @@ const usuarioPost = async (req, res = response) =>{
 const usuarioPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, esAdmin}= req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol}= req.body
 
     passwordC = undefined
     
@@ -69,11 +69,10 @@ const usuarioPut = async (req, res = response) =>{
         passwordC = await bcryptjs.hashSync( password, salt)
     }
     
-    
     try {
 
-        const [result] = await pool.promise().query('UPDATE usuario SET nombre = IFNULL(?,nombre), apellido = IFNULL(?,apellido), idempresa = IFNULL(?,idempresa), nro_documento = IFNULL(?,nro_documento), email = IFNULL(?,email), password = IFNULL(?,password), telefono = IFNULL(?,telefono), idrol = IFNULL(?,idrol), esAdmin = IFNULL(?,esAdmin) WHERE idusuario = ?', 
-        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, esAdmin, id])
+        const [result] = await pool.promise().query('UPDATE usuario SET nombre = IFNULL(?,nombre), apellido = IFNULL(?,apellido), idempresa = IFNULL(?,idempresa), nro_documento = IFNULL(?,nro_documento), email = IFNULL(?,email), password = IFNULL(?,password), telefono = IFNULL(?,telefono), idrol = IFNULL(?,idrol) WHERE idusuario = ?', 
+        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Usuario no encontrado'

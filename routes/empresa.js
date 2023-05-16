@@ -2,7 +2,7 @@ const { Router } = require('express');
 const { empresasGet, empresaGet, empresaXUsuarioGet, empresaPost, empresaPut, empresaDelete, empresaXNombreGet } = require('../controllers/empresaController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { idUsuarioValidacion, cuitUpdateValidacion, direccionValidacion, tipoEmpresaValidacion, cuitValidacion, idEmpresaValidacion } = require('../helpers/db-validators');
+const { idUsuarioValidacion, cuitUpdateValidacion, direccionValidacion, tipoEmpresaValidacion, cuitValidacion, idEmpresaValidacion, idAdminValidacion } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esRRHHRol } = require('../middlewares/validar-roles');
 
@@ -36,6 +36,7 @@ routerEmpresas.post('/', [
     check('telefono', 'El telefono debe contener 7 o mas caracteres').notEmpty().isLength({min:7}),
     check('cuit', 'El cuit debe contener 11 caracteres').notEmpty().isLength({min:11, max:11}),
     check('iddireccion').notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
+    check('idadmin').notEmpty().withMessage('El usuario administrador es obligatorio').custom( idAdminValidacion ),
     validarCampos
     ],
     empresaPost)
@@ -48,6 +49,7 @@ routerEmpresas.patch('/:id', [
     check('telefono', 'El telefono debe contener 7 o mas caracteres').optional().notEmpty().isLength({min:7}),
     check('cuit', 'El cuit debe contener 11 caracteres').optional().notEmpty().isLength({min:11, max:11}).custom( cuitUpdateValidacion ),
     check('iddireccion').notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
+    check('idadmin').notEmpty().withMessage('El usuario administrador es obligatorio').custom( idAdminValidacion ),
     validarCampos
     ],
     empresaPut)

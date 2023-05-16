@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { paisesGet, provinciasGet, localidadesGet, barriosGet, direccionGet, direccionPost, paisGet, provinciaGet, localidadGet, barrioGet, direccionPut } = require('../controllers/direccionController');
+const { paisesGet, provinciasGet, localidadesGet, barriosGet, direccionGet, direccionPost, paisGet, provinciaGet, localidadGet, barrioGet, direccionPut, barriosGetAll, barriosNombreGet } = require('../controllers/direccionController');
 const { idBarrioValidacion, idDireccionValidacion } = require('../helpers/db-validators');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
@@ -11,6 +11,10 @@ routerDirecciones.get('/paises', paisesGet )
 routerDirecciones.post('/provincias', provinciasGet )
 routerDirecciones.post('/localidades', localidadesGet )
 routerDirecciones.post('/barrios', barriosGet )
+
+routerDirecciones.get('/barrios/all', barriosGetAll )
+
+routerDirecciones.post('/barrios/nombre', barriosNombreGet )
 
 routerDirecciones.get('/paises/:id', paisGet )
 routerDirecciones.get('/provincias/:id', provinciaGet )

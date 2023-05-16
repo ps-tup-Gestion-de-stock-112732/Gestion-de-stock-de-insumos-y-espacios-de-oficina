@@ -59,6 +59,34 @@ const barriosGet = async (req = request, res = response) =>{
 
 }
 
+const barriosNombreGet = async (req = request, res = response) =>{
+
+    const {nombre} = req.body
+
+    try {
+        const [results] = await pool.promise().query('SELECT * FROM barrio WHERE nombre LIKE ?', ['%'+nombre+'%'])
+        res.json(results)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const barriosGetAll = async (req = request, res = response) =>{
+
+    try {
+        const [results] = await pool.promise().query('SELECT * FROM barrio')
+        res.json(results)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 const direccionGet = async (req = request, res = response) =>{
 
     try {
@@ -187,5 +215,7 @@ module.exports = {
     provinciaGet,
     localidadGet,
     barrioGet,
-    direccionPut
+    direccionPut,
+    barriosGetAll,
+    barriosNombreGet
 }

@@ -5,19 +5,10 @@ const { subirArchivo } = require('../helpers/subir-archivo.js')
 
 const empleadosGet = async (req = request, res = response) =>{
 
-    let desde = Number(0)
-    let limite = Number(5)
-
-    if (req.query.desde) {
-        desde = Number(req.query.desde)
-    }
-
-    if (req.query.limite) {
-        limite = Number(req.query.limite)
-    }
+    const {idempresa} = req.body
 
     try {
-        const [results] = await pool.promise().query('SELECT * FROM usuario WHERE idrol = 5 LIMIT ?,?', [desde, limite])
+        const [results] = await pool.promise().query('SELECT * FROM usuario WHERE idrol = 5 AND idempresa = ? AND estado = 1', [idempresa])
         res.json(results)
     } catch (error) {
         return res.status(500).json({
@@ -30,13 +21,33 @@ const empleadosGet = async (req = request, res = response) =>{
 const empleadoGet = async (req = request, res = response) =>{
 
     try {
-        const [result] = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ?', [req.params.id])
+        const [result] = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ? AND estado = 1', [req.params.id])
 
         if (result.length <= 0) return res.status(404).json({
             message: 'Usuario no encontrado'
         })
 
         res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
+const empleadoXNombreGet = async (req = request, res = response) =>{
+
+    const {nombre, idempresa} = req.body
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM usuario WHERE (nombre LIKE ? OR apellido LIKE ?) AND idrol = 5 AND idempresa = ? AND estado = 1', ['%'+nombre+'%', '%'+nombre+'%', idempresa])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Sin coincidencias para el empleado: '+nombre
+        })
+
+        res.json(result)
     } catch (error) {
         return res.status(500).json({
             message: 'Algo salio mal'
@@ -91,14 +102,17 @@ const cargarArchivo = async (req, res = response) =>{
         return;
     }
 
+    const {idempresa} = req.body
+
     try {
         
         const data = await subirArchivo( req.files, ['xlsx'], 'empleados')
-
+        
         for (const empleado of data) {
-            
+
             const estado = 1
             const idrol = 5
+            
             let pass = toString(empleado.password)
 
             //Encriptar password
@@ -106,13 +120,13 @@ const cargarArchivo = async (req, res = response) =>{
             let passwordC = await bcryptjs.hashSync( pass, salt)
 
             const [rows] = await pool.promise().query('INSERT INTO usuario (nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado, idarea, iddireccion) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
-            [empleado.nombre, empleado.apellido, empleado.idempresa, empleado.nro_documento, empleado.email, passwordC, empleado.telefono, idrol, estado, empleado.idarea, empleado.iddireccion])
+            [empleado.nombre, empleado.apellido, idempresa, empleado.nro_documento, empleado.email, passwordC, empleado.telefono, idrol, estado, empleado.idarea, empleado.iddireccion])
 
             empleados.push({
                 idusuario: rows.insertId,
                 nombre: empleado.nombre, 
                 apellido: empleado.apellido, 
-                idempresa: empleado.idempresa, 
+                idempresa: idempresa, 
                 nro_documento: empleado.nro_documento, 
                 email: empleado.email,
                 telefono: empleado.telefono, 
@@ -136,15 +150,19 @@ const cargarArchivo = async (req, res = response) =>{
 const empleadoPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, idarea, iddireccion}= req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, idarea}= req.body
 
-    const salt = bcryptjs.genSaltSync()
-    passwordC = await bcryptjs.hashSync( password, salt)
+    passwordC = undefined
+    
+    if (password != undefined) {
+        const salt = bcryptjs.genSaltSync()
+        passwordC = await bcryptjs.hashSync( password, salt)
+    }
     
     try {
 
-        const [result] = await pool.promise().query('UPDATE usuario SET nombre = ?, apellido = ?, idempresa = ?, nro_documento = ?, email = ?, password = ?, telefono = ?, idrol = ?, idarea = ?, iddireccion = ? WHERE idusuario = ?', 
-        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, idarea, iddireccion, id])
+        const [result] = await pool.promise().query('UPDATE usuario SET nombre = IFNULL(?,nombre), apellido = IFNULL(?,apellido), idempresa = IFNULL(?,idempresa), nro_documento = IFNULL(?,nro_documento), email = IFNULL(?,email), password = IFNULL(?,password), telefono = IFNULL(?,telefono), idrol = IFNULL(?,idrol), idarea = IFNULL(?,idarea) WHERE idusuario = ?', 
+        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, idarea, id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Empleado no encontrado'
@@ -189,11 +207,29 @@ const empleadoDelete = async (req, res = response) =>{
 
 }
 
+const areaXEmpresa = async (req = request, res = response) =>{
+
+    const {idarea, idempresa} = req.body
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM usuario WHERE idarea = ? AND idempresa = ? AND estado = 1 AND idrol = 5', [idarea, idempresa])
+
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 module.exports = {
     empleadosGet,
     empleadoGet,
     empleadoPost,
     cargarArchivo,
     empleadoPut,
-    empleadoDelete
+    empleadoDelete,
+    empleadoXNombreGet,
+    areaXEmpresa
 }
