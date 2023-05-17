@@ -33,13 +33,14 @@ routerProveedores.post('/', [
     ],
     proveedorPost)
 
-routerProveedores.put('/:id', [
+routerProveedores.patch('/:id', [
     validatJWT,
     esProveedorRol,
     check('nombre', 'El nombre es obligatorio').notEmpty(),
-    check('telefono', 'El telefono debe contener 7 o mas caracteres').isLength({min:7}),
-    check('cuit', 'El cuit debe contener 11 caracteres').isLength({min:11, max:11}).custom( cuitUpdateValidacion ),
-    check('iddireccion').notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
+    check('telefono', 'El telefono debe contener 7 o mas caracteres').optional().isLength({min:7}),
+    check('cuit', 'El cuit debe contener 11 caracteres').optional().isLength({min:11, max:11}).custom( cuitUpdateValidacion ),
+    check('iddireccion').optional().notEmpty().withMessage('La direccion es obligatoria').custom( direccionValidacion ),
+    check('idadmin').notEmpty().withMessage('El usuario administrador es obligatorio').custom( idAdminValidacion ),
     validarCampos
     ],
     proveedorPut)
