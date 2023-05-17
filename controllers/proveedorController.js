@@ -118,10 +118,39 @@ const proveedorDelete = async (req, res = response) =>{
 
 }
 
+const proveedorDesvincular = async (req, res = response) =>{
+
+    const id = req.params.id
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE usuario SET idempresa = NULL WHERE idusuario = ?', 
+        [id])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar el usuario'
+        })
+
+        const usuario = await pool.promise().query('SELECT * FROM usuario WHERE idusuario = ?', [id])
+        const usuarioSinEmpresa = usuario[0]
+
+        res.json({
+            usuarioSinEmpresa
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 module.exports = {
     proveedoresGet,
     proveedorPost,
     proveedorPut,
     proveedorDelete,
-    proveedorXNombreGet
+    proveedorXNombreGet,
+    proveedorDesvincular
 }
