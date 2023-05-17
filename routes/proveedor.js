@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { proveedorPost, proveedorPut, proveedorDelete, proveedoresGet, proveedorXNombreGet } = require('../controllers/proveedorController');
+const { proveedorPost, proveedorPut, proveedorDelete, proveedoresGet, proveedorXNombreGet, proveedorDesvincular } = require('../controllers/proveedorController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { direccionValidacion, cuitValidacion, cuitUpdateValidacion, idProveedorValidacion, tipoEmpresaValidacion, idAdminValidacion } = require('../helpers/db-validators');
+const { direccionValidacion, cuitValidacion, cuitUpdateValidacion, idProveedorValidacion, tipoEmpresaValidacion, idAdminValidacion, idUsuarioValidacion } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esProveedorRol } = require('../middlewares/validar-roles');
 
@@ -52,5 +52,13 @@ routerProveedores.put('/delete/:id',[
     validarCampos
     ],
     proveedorDelete)
+
+routerProveedores.put('/desvincular/:id',[
+    validatJWT,
+    esProveedorRol,
+    check('id').notEmpty().withMessage('El id de usuario es obligatorio').custom( idUsuarioValidacion ),
+    validarCampos
+    ],
+    proveedorDesvincular)
 
 module.exports = routerProveedores;
