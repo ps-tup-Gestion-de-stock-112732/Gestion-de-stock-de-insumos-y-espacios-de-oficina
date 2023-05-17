@@ -66,13 +66,13 @@ const proveedorPost = async (req, res = response) =>{
 const proveedorPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {nombre, telefono, cuit, iddireccion} = req.body
+    const {nombre, telefono, cuit, iddireccion, idadmin} = req.body
     const tipoempresa = 2
 
     try {
 
-        const [result] = await pool.promise().query('UPDATE empresa SET nombre = ?, telefono = ?, cuit = ?, iddireccion = ? WHERE idempresa = ? AND tipoempresa = ?', 
-        [nombre, telefono, cuit, iddireccion, id, tipoempresa])
+        const [result] = await pool.promise().query('UPDATE empresa SET nombre = IFNULL(?,nombre), telefono = IFNULL(?,telefono), cuit = IFNULL(?,cuit), iddireccion = IFNULL(?,iddireccion), idadmin = IFNULL(?,idadmin) WHERE idempresa = ? AND tipoempresa = ?', 
+        [nombre, telefono, cuit, iddireccion, idadmin, id, tipoempresa])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Empresa no encontrada'

@@ -109,7 +109,7 @@ const empresaPut = async (req, res = response) =>{
     try {
 
         const [result] = await pool.promise().query('UPDATE empresa SET nombre = IFNULL(?,nombre), telefono = IFNULL(?,telefono), cuit = IFNULL(?,cuit), iddireccion = IFNULL(?,iddireccion), idadmin = IFNULL(?,idadmin) WHERE idempresa = ? AND tipoempresa = ?', 
-        [nombre, telefono, cuit, iddireccion, id, tipoempresa, idadmin])
+        [nombre, telefono, cuit, iddireccion, idadmin, id, tipoempresa])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Empresa no encontrada'
