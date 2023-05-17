@@ -1,21 +1,49 @@
 const { response } = require('express')
 const { pool } =require('../db.js')
 
+const productosGet = async (req = request, res = response) =>{
+
+    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ?',[req.body.idProveedor])
+    res.json(results)
+}
+
+const productoXNombreGet = async (req = request, res = response) =>{
+
+    const {nombreProducto, idProveedor} = req.body
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM producto WHERE nombreProducto LIKE ? AND idProveedor = ? AND estado = 1', ['%'+nombreProducto+'%', idProveedor])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Sin coincidencias para el producto: '+nombre
+        })
+
+        res.json(result)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 const productoPost = async (req, res = response) =>{
 
     const {codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad} = req.body
+    const estado = 1
 
     //Guardar en BD
     try {
-        const [rows] = await pool.promise().query('INSERT INTO producto (codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad) VALUES (?,?,?,?,?,?)', 
-        [codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad])
+        const [rows] = await pool.promise().query('INSERT INTO producto (codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, estado) VALUES (?,?,?,?,?,?,?)', 
+        [codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, estado])
         res.send({
             codigo, 
             idProveedor, 
             nombreProducto, 
             descripcion, 
             precioUnitario, 
-            cantidad
+            cantidad,
+            estado
         })
     } catch (error) {
         return res.status(500).json({
@@ -26,5 +54,7 @@ const productoPost = async (req, res = response) =>{
 }
 
 module.exports = {
+    productosGet,
+    productoXNombreGet,
     productoPost
 }

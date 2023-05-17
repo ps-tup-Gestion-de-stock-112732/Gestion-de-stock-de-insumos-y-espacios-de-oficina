@@ -168,6 +168,7 @@ CREATE TABLE `gestiondb`.`producto` (
   `cantidad` INT NOT NULL,
   `idProveedor` INT NOT NULL,
   `imagen` VARCHAR(100) NULL,
+  `estado` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`codigo`),
   INDEX `proveedor_producto_fk_idx` (`idProveedor` ASC) VISIBLE,
   CONSTRAINT `proveedor_producto_fk`
