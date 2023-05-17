@@ -160,6 +160,22 @@ CREATE TABLE `gestiondb`.`usuario` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+CREATE TABLE `gestiondb`.`producto` (
+  `codigo` INT NOT NULL,
+  `nombreProducto` VARCHAR(45) NOT NULL,
+  `descripcion` VARCHAR(45) NOT NULL,
+  `precioUnitario` DECIMAL(6,2) NOT NULL,
+  `cantidad` INT NOT NULL,
+  `idProveedor` INT NOT NULL,
+  `imagen` VARCHAR(100) NULL,
+  PRIMARY KEY (`codigo`),
+  INDEX `proveedor_producto_fk_idx` (`idProveedor` ASC) VISIBLE,
+  CONSTRAINT `proveedor_producto_fk`
+    FOREIGN KEY (`idProveedor`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
 
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('0', 'Inactivo');

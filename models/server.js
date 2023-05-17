@@ -15,6 +15,7 @@ class Server{
         this.areaPath = '/api/areas';
         this.direccionPath = '/api/direcciones';
         this.proveedorPath = '/api/proveedores';
+        this.productoPath = '/api/productos';
         
         //Middlewares
         this.middlewares();
@@ -49,6 +50,7 @@ class Server{
         this.app.use(this.areaPath, require('../routes/areas'))
         this.app.use(this.direccionPath, require('../routes/direcciones'))
         this.app.use(this.proveedorPath, require('../routes/proveedor'))
+        this.app.use(this.productoPath, require('../routes/producto'))
 
         this.app.use((req, res, next)=>{
             res.status(404).json({
