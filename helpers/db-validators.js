@@ -255,6 +255,20 @@ const idProveedorValidacion = (value, {req} )=> {
     })
 }
 
+const codigoValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM producto WHERE codigo = ?', [req.body.codigo], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length != 0) 
+                reject(new Error('El codigo de producto ingresado ya existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idBarrioValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM barrio WHERE idbarrio = ?', [req.body.idbarrio], (err, res)=>{
@@ -333,5 +347,6 @@ module.exports = {
     idDireccionValidacion,
     idRolValidacion,
     idAreaValidacion,
-    idAdminValidacion
+    idAdminValidacion,
+    codigoValidacion
 }
