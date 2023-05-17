@@ -53,8 +53,37 @@ const productoPost = async (req, res = response) =>{
     
 }
 
+const productoDelete = async (req, res = response) =>{
+
+    const id = req.params.id
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE producto SET estado = 0 WHERE codigo = ?', 
+        [id])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar el producto'
+        })
+
+        const producto = await pool.promise().query('SELECT * FROM producto WHERE codigo = ?', [id])
+        const productoBorrado = producto[0]
+
+        res.json({
+            productoBorrado
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 module.exports = {
     productosGet,
     productoXNombreGet,
-    productoPost
+    productoPost,
+    productoDelete
 }
