@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { productoPost, productosGet, productoXNombreGet } = require('../controllers/productoController');
+const { productoPost, productosGet, productoXNombreGet, productoDelete } = require('../controllers/productoController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { codigoValidacion, idProveedorValidacion, empresaValidacion } = require('../helpers/db-validators');
+const { codigoValidacion, idProveedorValidacion, empresaValidacion, codigoValidacionSi } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esProveedorRol } = require('../middlewares/validar-roles');
 
@@ -33,5 +33,13 @@ routerProducto.post('/', [
     validarCampos
     ],
     productoPost)
+
+routerProducto.put('/delete/:id',[
+    validatJWT,
+    esProveedorRol,
+    check('id').notEmpty().withMessage('El codigo de producto es obligatorio').custom( codigoValidacionSi ),
+    validarCampos
+    ],
+    productoDelete)
 
 module.exports = routerProducto;

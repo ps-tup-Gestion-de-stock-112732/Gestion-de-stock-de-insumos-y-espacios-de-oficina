@@ -269,6 +269,34 @@ const codigoValidacion = (value, {req} )=> {
     })
 }
 
+const codigoValidacionSiBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM producto WHERE codigo = ?', [req.body.codigo], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El codigo de producto ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const codigoValidacionSiParams = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM producto WHERE codigo = ?', [req.params.codigo], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El codigo de producto ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idBarrioValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM barrio WHERE idbarrio = ?', [req.body.idbarrio], (err, res)=>{
@@ -348,5 +376,7 @@ module.exports = {
     idRolValidacion,
     idAreaValidacion,
     idAdminValidacion,
-    codigoValidacion
+    codigoValidacion,
+    codigoValidacionSiParams,
+    codigoValidacionSiBody
 }
