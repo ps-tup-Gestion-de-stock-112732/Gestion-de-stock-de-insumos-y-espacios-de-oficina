@@ -255,6 +255,20 @@ const idProveedorValidacion = (value, {req} )=> {
     })
 }
 
+const idProveedorValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM empresa WHERE idempresa = ? AND tipoempresa = 2', [req.body.idProveedor], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El proveedor ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const codigoValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM producto WHERE codigo = ?', [req.body.codigo], (err, res)=>{
@@ -285,7 +299,7 @@ const codigoValidacionSiBody = (value, {req} )=> {
 
 const codigoValidacionSiParams = (value, {req} )=> {
     return new Promise((resolve, reject) => {
-        pool.query('SELECT * FROM producto WHERE codigo = ?', [req.params.codigo], (err, res)=>{
+        pool.query('SELECT * FROM producto WHERE codigo = ?', [req.params.id], (err, res)=>{
             if (err) 
                 reject(new Error('Server error'))
 
@@ -378,5 +392,6 @@ module.exports = {
     idAdminValidacion,
     codigoValidacion,
     codigoValidacionSiParams,
-    codigoValidacionSiBody
+    codigoValidacionSiBody,
+    idProveedorValidacionBody
 }

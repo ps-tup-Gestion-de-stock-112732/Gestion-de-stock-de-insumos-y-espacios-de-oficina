@@ -3,16 +3,33 @@ const { pool } =require('../db.js')
 
 const productosGet = async (req = request, res = response) =>{
 
-    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ?',[req.body.idProveedor])
+    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ?',[req.body.idempresa])
     res.json(results)
+}
+
+const productoGet = async (req = request, res = response) =>{
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM producto WHERE codigo = ?', [req.params.id])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Producto no encontrado'
+        })
+
+        res.json(result[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
 }
 
 const productoXNombreGet = async (req = request, res = response) =>{
 
-    const {nombreProducto, idProveedor} = req.body
+    const {nombreProducto, idempresa} = req.body
 
     try {
-        const [result] = await pool.promise().query('SELECT * FROM producto WHERE nombreProducto LIKE ? AND idProveedor = ? AND estado = 1', ['%'+nombreProducto+'%', idProveedor])
+        const [result] = await pool.promise().query('SELECT * FROM producto WHERE nombreProducto LIKE ? AND idProveedor = ? AND estado = 1', ['%'+nombreProducto+'%', idempresa])
 
         if (result.length <= 0) return res.status(404).json({
             message: 'Sin coincidencias para el producto: '+nombre
@@ -53,6 +70,31 @@ const productoPost = async (req, res = response) =>{
     
 }
 
+const productoPut = async (req, res = response) =>{
+
+    const {id} = req.params
+    const {idProveedor, nombreProducto, descripcion, precioUnitario, cantidad}= req.body
+    
+    try {
+
+        const [result] = await pool.promise().query('UPDATE usuario SET nombreProducto = IFNULL(?,nombreProducto), descripcion = IFNULL(?,descripcion), precioUnitario = IFNULL(?,precioUnitario), cantidad = IFNULL(?,cantidad) WHERE codigo = ?, AND idProveedor = ?', 
+        [nombreProducto, descripcion, precioUnitario, cantidad, id, idProveedor])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'Producto no encontrado'
+        })
+
+        const [rows] = await pool.promise().query('SELECT * FROM producto WHERE codigo = ?', [id])
+
+        res.json(rows[0])
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
 const productoDelete = async (req, res = response) =>{
 
     const id = req.params.id
@@ -83,7 +125,9 @@ const productoDelete = async (req, res = response) =>{
 
 module.exports = {
     productosGet,
+    productoGet,
     productoXNombreGet,
     productoPost,
-    productoDelete
+    productoDelete,
+    productoPut
 }
