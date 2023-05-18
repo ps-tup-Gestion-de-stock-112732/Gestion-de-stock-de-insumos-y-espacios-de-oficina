@@ -164,7 +164,7 @@ CREATE TABLE `gestiondb`.`producto` (
   `codigo` INT NOT NULL,
   `nombreProducto` VARCHAR(45) NOT NULL,
   `descripcion` VARCHAR(45) NOT NULL,
-  `precioUnitario` DECIMAL(6,2) NOT NULL,
+  `precioUnitario` DECIMAL(8,2) NOT NULL,
   `cantidad` INT NOT NULL,
   `idProveedor` INT NOT NULL,
   `imagen` VARCHAR(100) NULL,
