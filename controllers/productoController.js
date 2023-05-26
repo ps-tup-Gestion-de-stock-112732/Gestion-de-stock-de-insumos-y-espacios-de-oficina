@@ -3,7 +3,7 @@ const { pool } =require('../db.js')
 
 const productosGet = async (req = request, res = response) =>{
 
-    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ?',[req.body.idempresa])
+    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ? AND cantidad > 0',[req.body.idempresa])
     res.json(results)
 }
 
@@ -46,13 +46,13 @@ const productoXNombreGet = async (req = request, res = response) =>{
 
 const productoPost = async (req, res = response) =>{
 
-    const {codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad} = req.body
+    const {codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, imagen, idcategoria} = req.body
     const estado = 1
 
     //Guardar en BD
     try {
-        const [rows] = await pool.promise().query('INSERT INTO producto (codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, estado) VALUES (?,?,?,?,?,?,?)', 
-        [codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, estado])
+        const [rows] = await pool.promise().query('INSERT INTO producto (codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, estado, imagen, idcategoria) VALUES (?,?,?,?,?,?,?,?,?)', 
+        [codigo, idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, estado, imagen, idcategoria])
         res.send({
             codigo, 
             idProveedor, 
@@ -60,7 +60,9 @@ const productoPost = async (req, res = response) =>{
             descripcion, 
             precioUnitario, 
             cantidad,
-            estado
+            estado,
+            imagen, 
+            idcategoria
         })
     } catch (error) {
         return res.status(500).json({
@@ -73,12 +75,12 @@ const productoPost = async (req, res = response) =>{
 const productoPut = async (req, res = response) =>{
 
     const {id} = req.params
-    const {idProveedor, nombreProducto, descripcion, precioUnitario, cantidad}= req.body
+    const {idProveedor, nombreProducto, descripcion, precioUnitario, cantidad, imagen, idcategoria}= req.body
     
     try {
 
-        const [result] = await pool.promise().query('UPDATE usuario SET nombreProducto = IFNULL(?,nombreProducto), descripcion = IFNULL(?,descripcion), precioUnitario = IFNULL(?,precioUnitario), cantidad = IFNULL(?,cantidad) WHERE codigo = ?, AND idProveedor = ?', 
-        [nombreProducto, descripcion, precioUnitario, cantidad, id, idProveedor])
+        const [result] = await pool.promise().query('UPDATE producto SET nombreProducto = IFNULL(?,nombreProducto), descripcion = IFNULL(?,descripcion), precioUnitario = IFNULL(?,precioUnitario), cantidad = IFNULL(?,cantidad), imagen = IFNULL(?,imagen), idcategoria = IFNULL(?,idcategoria) WHERE codigo = ? AND idProveedor = ?', 
+        [nombreProducto, descripcion, precioUnitario, cantidad, imagen, idcategoria, id, idProveedor])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'Producto no encontrado'
@@ -94,6 +96,36 @@ const productoPut = async (req, res = response) =>{
     }
     
 }
+
+const productoCantidadPut = async (req, res = response) =>{
+
+    const id = req.params.id
+    const {cantidad} = req.body
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE producto SET cantidad = (cantidad - ?) WHERE codigo = ?', 
+        [cantidad, id])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar el producto'
+        })
+
+        const producto = await pool.promise().query('SELECT * FROM producto WHERE codigo = ?', [id])
+        const productoActualizado = producto[0]
+
+        res.json({
+            productoActualizado
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 
 const productoDelete = async (req, res = response) =>{
 
@@ -129,5 +161,6 @@ module.exports = {
     productoXNombreGet,
     productoPost,
     productoDelete,
-    productoPut
+    productoPut,
+    productoCantidadPut
 }

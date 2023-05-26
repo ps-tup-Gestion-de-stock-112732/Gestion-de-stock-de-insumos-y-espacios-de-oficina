@@ -16,6 +16,13 @@ class Server{
         this.direccionPath = '/api/direcciones';
         this.proveedorPath = '/api/proveedores';
         this.productoPath = '/api/productos';
+        this.solicitudPath = '/api/solicitudes';
+        this.contratoPath = '/api/contratos';
+        this.estadoPath = '/api/estados';
+        this.autorizantePath = '/api/autorizantes';
+        this.categoriaPath = '/api/categorias';
+        this.pedidoPath = '/api/pedidos';
+        this.solicitudGestionPath = '/api/solicitud-gestion';
         
         //Middlewares
         this.middlewares();
@@ -51,6 +58,13 @@ class Server{
         this.app.use(this.direccionPath, require('../routes/direcciones'))
         this.app.use(this.proveedorPath, require('../routes/proveedor'))
         this.app.use(this.productoPath, require('../routes/producto'))
+        this.app.use(this.solicitudPath, require('../routes/solicitud'))
+        this.app.use(this.contratoPath, require('../routes/contrato'))
+        this.app.use(this.estadoPath, require('../routes/estado'))
+        this.app.use(this.autorizantePath, require('../routes/autorizante'))
+        this.app.use(this.categoriaPath, require('../routes/categorias'))
+        this.app.use(this.pedidoPath, require('../routes/pedido'))
+        this.app.use(this.solicitudGestionPath, require('../routes/solicitud-gestion'))
 
         this.app.use((req, res, next)=>{
             res.status(404).json({

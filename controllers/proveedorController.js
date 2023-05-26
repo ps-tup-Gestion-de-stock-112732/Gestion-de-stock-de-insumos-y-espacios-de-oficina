@@ -16,12 +16,64 @@ const proveedoresGet = async (req = request, res = response) =>{
 
 }
 
+const proveedoresMenosGet = async (req = request, res = response) =>{
+
+    const {idempresa} = req.body
+
+    try {
+        const [results] = await pool.promise().query('SELECT * FROM empresa WHERE estado = 1 AND tipoempresa= 2 '+
+                                                    'AND idempresa NOT IN (select idempresaProveedor '+
+                                                                            'from autorizacionempresa '+
+                                                                            'where idestado = 1 '+
+                                                                            'and idempresa = ?) '+
+                                                    'AND idempresa NOT IN (select idempresaProveedor '+
+                                                                            'from contrato '+
+                                                                            'where fechaFin IS NULL '+
+                                                                            'and idempresa = ?)', [idempresa, idempresa])
+        res.json(results)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 const proveedorXNombreGet = async (req = request, res = response) =>{
 
     const {nombre, tipoempresa} = req.body
 
     try {
-        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE nombre LIKE ? AND tipoempresa = ?', ['%'+nombre+'%', tipoempresa])
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE nombre LIKE ? AND tipoempresa = ? AND estado = 1', ['%'+nombre+'%', tipoempresa])
+
+        if (result.length <= 0) return res.status(404).json({
+            message: 'Sin coincidencias para el proveedor: '+nombre
+        })
+
+        res.json(result)
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+    
+}
+
+
+const proveedorMenosXNombreGet = async (req = request, res = response) =>{
+
+    const {nombre, idempresa} = req.body
+
+    try {
+        const [result] = await pool.promise().query('SELECT * FROM empresa WHERE nombre LIKE ? AND tipoempresa = 2 AND estado = 1 '+
+                                                    'AND idempresa NOT IN (select idempresaProveedor '+
+                                                                            'from autorizacionempresa '+
+                                                                            'where idestado = 1 '+
+                                                                            'and idempresa = ?) '+
+                                                    'AND idempresa NOT IN (select idempresaProveedor '+
+                                                                            'from contrato '+
+                                                                            'where fechaFin IS NULL '+
+                                                                            'and idempresa = ?)', ['%'+nombre+'%', idempresa, idempresa])
 
         if (result.length <= 0) return res.status(404).json({
             message: 'Sin coincidencias para el proveedor: '+nombre
@@ -152,5 +204,7 @@ module.exports = {
     proveedorPut,
     proveedorDelete,
     proveedorXNombreGet,
-    proveedorDesvincular
+    proveedorDesvincular,
+    proveedoresMenosGet,
+    proveedorMenosXNombreGet
 }

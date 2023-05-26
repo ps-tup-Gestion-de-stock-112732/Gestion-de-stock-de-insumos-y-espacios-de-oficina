@@ -160,28 +160,284 @@ CREATE TABLE `gestiondb`.`usuario` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+
+CREATE TABLE `gestiondb`.`categoria` (
+  `idcategoria` INT NOT NULL AUTO_INCREMENT,
+  `descripcion` VARCHAR(45) NOT NULL,
+  `idempresa` INT NOT NULL,
+  `estado` INT NOT NULL,
+  PRIMARY KEY (`idcategoria`),
+  INDEX `empresa_categoria_fk_idx` (`idempresa` ASC) VISIBLE,
+  CONSTRAINT `empresa_categoria_fk`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
 CREATE TABLE `gestiondb`.`producto` (
   `codigo` INT NOT NULL,
   `nombreProducto` VARCHAR(45) NOT NULL,
-  `descripcion` VARCHAR(45) NOT NULL,
-  `precioUnitario` DECIMAL(8,2) NOT NULL,
+  `descripcion` VARCHAR(100) NOT NULL,
+  `precioUnitario` INT NOT NULL,
   `cantidad` INT NOT NULL,
   `idProveedor` INT NOT NULL,
-  `imagen` VARCHAR(100) NULL,
+  `imagen` VARCHAR(200) NULL,
   `estado` INT NOT NULL DEFAULT 1,
+  `idcategoria` INT NOT NULL,
   PRIMARY KEY (`codigo`),
   INDEX `proveedor_producto_fk_idx` (`idProveedor` ASC) VISIBLE,
+  INDEX `categoria_producto_fk_idx` (`idcategoria` ASC) VISIBLE,
   CONSTRAINT `proveedor_producto_fk`
     FOREIGN KEY (`idProveedor`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `categoria_producto_fk`
+    FOREIGN KEY (`idcategoria`)
+    REFERENCES `gestiondb`.`categoria` (`idcategoria`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `gestiondb`.`pedido` (
+  `idpedido` INT NOT NULL AUTO_INCREMENT,
+  `idempleado` INT NOT NULL,
+  `idempresa` INT NOT NULL,
+  `idproveedor` INT NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  PRIMARY KEY (`idpedido`),
+  INDEX `pedido_empleado_idx` (`idempleado` ASC) VISIBLE,
+  INDEX `pedido_empresa_fk_idx` (`idempresa` ASC) VISIBLE,
+  INDEX `peido_proveedor_fk_idx` (`idproveedor` ASC) VISIBLE,
+  CONSTRAINT `pedido_empleado_fk`
+    FOREIGN KEY (`idempleado`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `pedido_empresa_fk`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `peido_proveedor_fk`
+    FOREIGN KEY (`idproveedor`)
     REFERENCES `gestiondb`.`empresa` (`idempresa`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
+CREATE TABLE `gestiondb`.`detallepedido` (
+  `iddetallepedido` INT NOT NULL AUTO_INCREMENT,
+  `idpedido` INT NOT NULL,
+  `idproducto` INT NOT NULL,
+  `cantidad` INT NOT NULL,
+  `precioUnitario` INT NOT NULL,
+  PRIMARY KEY (`iddetallepedido`),
+  INDEX `detalle_pedido_fk_idx` (`idpedido` ASC) VISIBLE,
+  INDEX `detalle_producto_fk_idx` (`idproducto` ASC) VISIBLE,
+  CONSTRAINT `detalle_pedido_fk`
+    FOREIGN KEY (`idpedido`)
+    REFERENCES `gestiondb`.`pedido` (`idpedido`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `detalle_producto_fk`
+    FOREIGN KEY (`idproducto`)
+    REFERENCES `gestiondb`.`producto` (`codigo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `gestiondb`.`estadoautorizacion` (
+  `idestado` INT NOT NULL AUTO_INCREMENT,
+  `descripcion` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idestado`));
+
+CREATE TABLE `gestiondb`.`autorizaciongestion` (
+  `idautorizacion` INT NOT NULL AUTO_INCREMENT,
+  `idpedido` INT NOT NULL,
+  `idestado` INT NOT NULL,
+  `fecha` DATETIME NULL,
+  `idautorizante` INT NULL,
+  PRIMARY KEY (`idautorizacion`),
+  INDEX `autogestion_pedido_fk_idx` (`idpedido` ASC) VISIBLE,
+  INDEX `autogestion_estado_fk_idx` (`idestado` ASC) VISIBLE,
+  INDEX `autogestion_autorizante_fk_idx` (`idautorizante` ASC) VISIBLE,
+  CONSTRAINT `autogestion_pedido_fk`
+    FOREIGN KEY (`idpedido`)
+    REFERENCES `gestiondb`.`pedido` (`idpedido`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autogestion_estado_fk`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autogestion_autorizante_fk`
+    FOREIGN KEY (`idautorizante`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `gestiondb`.`autorizacionxventa` (
+  `idautorizacion` INT NOT NULL AUTO_INCREMENT,
+  `idpedido` INT NOT NULL,
+  `idestado` INT NOT NULL,
+  `fecha` DATETIME NULL,
+  `idautorizante` INT NULL,
+  PRIMARY KEY (`idautorizacion`),
+  INDEX `autoventa_autorizante_fk_idx` (`idautorizante` ASC) VISIBLE,
+  INDEX `autogestion_estado_fk_idx` (`idestado` ASC) VISIBLE,
+  INDEX `autogestion_pedido_fk_idx` (`idpedido` ASC) VISIBLE,
+  CONSTRAINT `autoventa_autorizante_fk`
+    FOREIGN KEY (`idautorizante`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autoventa_estado_fk`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autoventa_pedido_fk`
+    FOREIGN KEY (`idpedido`)
+    REFERENCES `gestiondb`.`pedido` (`idpedido`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `gestiondb`.`autorizacionempresa` (
+  `idautorizacion` INT NOT NULL AUTO_INCREMENT,
+  `idempresaProveedor` INT NOT NULL,
+  `idempresa` INT NOT NULL,
+  `idestado` INT NOT NULL,
+  `idautorizante` INT NULL,
+  `fecha` DATETIME NOT NULL,
+  `idsolicitante` INT NOT NULL,
+  PRIMARY KEY (`idautorizacion`),
+  INDEX `autoempresa_empresa_fk_idx` (`idempresa` ASC) VISIBLE,
+  INDEX `autoempresa_proveedor_fk_idx` (`idempresaProveedor` ASC) VISIBLE,
+  INDEX `autoempresa_estado_fk_idx` (`idestado` ASC) VISIBLE,
+  INDEX `autoempresa_autorizante_fk_idx` (`idautorizante` ASC) VISIBLE,
+  INDEX `autoempresa_solicitante_fk_idx` (`idsolicitante` ASC) VISIBLE,
+  CONSTRAINT `autoempresa_empresa_fk`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autoempresa_proveedor_fk`
+    FOREIGN KEY (`idempresaProveedor`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autoempresa_estado_fk`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autoempresa_autorizante_fk`
+    FOREIGN KEY (`idautorizante`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `autoempresa_solicitante_fk`
+    FOREIGN KEY (`idsolicitante`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `gestiondb`.`contrato` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `idempresa` INT NOT NULL,
+  `idempresaProveedor` INT NOT NULL,
+  `fechaFin` DATETIME NULL,
+  `idautorizacion` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `empresa_contrato_fk_idx` (`idempresa` ASC) VISIBLE,
+  INDEX `proveedor_contrato_fk_idx` (`idempresaProveedor` ASC) VISIBLE,
+  INDEX `auto_contrato_fk_idx` (`idautorizacion` ASC) VISIBLE,
+  CONSTRAINT `empresa_contrato_fk`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `proveedor_contrato_fk`
+    FOREIGN KEY (`idempresaProveedor`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `auto_contrato_fk`
+    FOREIGN KEY (`idautorizacion`)
+    REFERENCES `gestiondb`.`autorizacionempresa` (`idautorizacion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `gestiondb`.`autorizacionusuarioemp` (
+  `idautorizacion` INT NOT NULL AUTO_INCREMENT,
+  `idusuario` INT NOT NULL,
+  `idempresa` INT NOT NULL,
+  `idestado` INT NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  PRIMARY KEY (`idautorizacion`),
+  INDEX `auto_usr_id_idx` (`idusuario` ASC) VISIBLE,
+  INDEX `auto_emp_id_idx` (`idempresa` ASC) VISIBLE,
+  INDEX `auto_estado_id_idx` (`idestado` ASC) VISIBLE,
+  CONSTRAINT `auto_usr_id`
+    FOREIGN KEY (`idusuario`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `auto_emp_id`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `auto_estado_id`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `gestiondb`.`autorizacionusuarioprov` (
+  `idautorizacion` INT NOT NULL AUTO_INCREMENT,
+  `idusuario` INT NOT NULL,
+  `idempresa` INT NOT NULL,
+  `idestado` INT NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  PRIMARY KEY (`idautorizacion`),
+  INDEX `auto_usr_prov_id_idx` (`idusuario` ASC) VISIBLE,
+  INDEX `auto_emp_prov_id_idx` (`idempresa` ASC) VISIBLE,
+  INDEX `auto_estado_prov_id_idx` (`idestado` ASC) VISIBLE,
+  CONSTRAINT `auto_usr_prov_id`
+    FOREIGN KEY (`idusuario`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `auto_emp_prov_id`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `auto_estado_prov_id`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+
+
+
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('1', 'Activo');
 INSERT INTO `gestiondb`.`estadousuario` (`idestadoUsuario`, `descripcion`) VALUES ('0', 'Inactivo');
 
-INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('1', 'rrhh');
+INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('1', 'Pendiente');
+INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('2', 'Aprobado');
+INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('3', 'Rechazado');
+INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('4', 'Cancelado');
+
+INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('1', 'empresa');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('2', 'gestion it');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('3', 'ventas');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('4', 'proveedor');

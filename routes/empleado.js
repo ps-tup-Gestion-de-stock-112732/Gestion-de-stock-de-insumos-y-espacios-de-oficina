@@ -52,7 +52,7 @@ routerEmpleados.patch('/:id', [
     esRRHHRol,
     check('id').notEmpty().withMessage('El id de empleado es obligatorio').custom( idEmpleadoValidacion ),
     check('email').optional().isEmail().withMessage('El email no es valido').custom( emailUpdateValidacion ),
-    check('password', 'El password debe contener 4 o mas caracteres').optional().isLength({min:4}),
+    check('password', 'El password debe contener 4 o mas caracteres').optional({nullable: true}).isLength({min:4}),
     check('nombre', 'El nombre es obligatorio').optional().notEmpty(),
     check('apellido', 'El apellido es obligatorio').optional().notEmpty(),
     check('idempresa').optional().notEmpty().withMessage('El idempresa es obligatorio').custom( empresaValidacion ),
