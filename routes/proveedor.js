@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { proveedorPost, proveedorPut, proveedorDelete, proveedoresGet, proveedorXNombreGet, proveedorDesvincular } = require('../controllers/proveedorController');
+const { proveedorPost, proveedorPut, proveedorDelete, proveedoresGet, proveedorXNombreGet, proveedorDesvincular, proveedoresMenosGet, proveedorMenosXNombreGet } = require('../controllers/proveedorController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { direccionValidacion, cuitValidacion, cuitUpdateValidacion, idProveedorValidacion, tipoEmpresaValidacion, idAdminValidacion, idUsuarioValidacion } = require('../helpers/db-validators');
+const { direccionValidacion, cuitValidacion, cuitUpdateValidacion, idProveedorValidacion, tipoEmpresaValidacion, idAdminValidacion, idUsuarioValidacion, idEmpresaValidacionBody } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 const { esProveedorRol } = require('../middlewares/validar-roles');
 
@@ -14,12 +14,25 @@ routerProveedores.post('/all', [
     ],
     proveedoresGet )
 
+routerProveedores.post('/disponibles', [
+    check('idempresa').notEmpty().withMessage('El id de empresa es obligatorio').custom( idEmpresaValidacionBody ),
+    validarCampos
+    ],
+    proveedoresMenosGet )
+
 routerProveedores.post('/nombre', [
     check('nombre').notEmpty().withMessage('El nombre de empresa es obligatorio'),
     check('tipoempresa').notEmpty().withMessage('El tipo de empresa es obligatorio').custom( tipoEmpresaValidacion ),
     validarCampos
     ],
     proveedorXNombreGet)
+
+routerProveedores.post('/disponibles/nombre', [
+    check('nombre').notEmpty().withMessage('El nombre de empresa es obligatorio'),
+    check('idempresa').notEmpty().withMessage('El id de empresa es obligatorio').custom( idEmpresaValidacionBody ),
+    validarCampos
+    ],
+    proveedorMenosXNombreGet)
 
 routerProveedores.post('/', [
     validatJWT,

@@ -157,6 +157,34 @@ const idUsuarioValidacion = (value, {req} )=> {
     })
 }
 
+const idUsuarioValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ?', [req.body.idusuario], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El usuario ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idUsuarioSolicitanteValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ?', [req.body.idsolicitante], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El usuario ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idAdminValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM usuario WHERE idusuario = ?', [req.body.idadmin], (err, res)=>{
@@ -213,6 +241,48 @@ const idEmpleadoValidacion = (value, {req} )=> {
     })
 }
 
+const idEmpleadoValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ? AND idrol = 5', [req.body.idempleado], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El empleado ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idAutorizanteValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ? AND (idrol = 2 OR idrol = 3 OR idrol = 4)', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El usuario ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idAutorizanteValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM usuario WHERE idusuario = ? AND (idrol = 2 OR idrol = 3 OR idrol = 4)', [req.body.idautorizante], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El autorizante ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idAreaValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM area WHERE idarea = ?', [req.params.id], (err, res)=>{
@@ -220,7 +290,7 @@ const idAreaValidacion = (value, {req} )=> {
                 reject(new Error('Server error'))
 
             if (res.length == 0) 
-                reject(new Error('El empleado ingresado no existe'))
+                reject(new Error('El autorizante ingresado no existe'))
             
             resolve(true)
         })
@@ -235,6 +305,119 @@ const idEmpresaValidacion = (value, {req} )=> {
 
             if (res.length == 0) 
                 reject(new Error('La empresa ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idEstadoValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM estadoautorizacion WHERE idestado = ? ', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El estado ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idSolicitudValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM autorizacionempresa WHERE idautorizacion = ? AND idestado = 1', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La solicitud ingresada no existe o no se encuentra en estado pendiente'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idSolicitudUsuarioEmpresaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM autorizacionusuarioemp WHERE idautorizacion = ? AND idestado = 1', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La solicitud ingresada no existe o no se encuentra en estado pendiente'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idSolicitudUsuarioProveedorValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM autorizacionusuarioprov WHERE idautorizacion = ? AND idestado = 1', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La solicitud ingresada no existe o no se encuentra en estado pendiente'))
+            
+            resolve(true)
+        })
+    })
+}
+
+
+const idSolicitudValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM autorizacionempresa WHERE idautorizacion = ? ', [req.body.idautorizacion], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La solicitud ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idEmpresaValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM empresa WHERE idempresa = ? AND tipoempresa = 1', [req.body.idempresa], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La empresa ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idContratoValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM contrato WHERE id = ? and fechaFin IS NULL', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El contrato ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idPedidoValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM pedido WHERE idpedido = ?', [req.body.idpedido], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El contrato ingresado no existe'))
             
             resolve(true)
         })
@@ -269,6 +452,34 @@ const idProveedorValidacionBody = (value, {req} )=> {
     })
 }
 
+const idCategoriaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM categoria WHERE idcategoria = ?', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La categoria ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idCategoriaValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM categoria WHERE idcategoria = ?', [req.body.idcategoria], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La categoria ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const codigoValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM producto WHERE codigo = ?', [req.body.codigo], (err, res)=>{
@@ -277,6 +488,34 @@ const codigoValidacion = (value, {req} )=> {
 
             if (res.length != 0) 
                 reject(new Error('El codigo de producto ingresado ya existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const cantidadProductoValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM producto WHERE codigo = ? AND cantidad >= 1', [req.body.codigo, req.body.cantidad], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La cantidad ingresada excede el stock del prodcuto'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const cantidadProductoValidacionCodigoParams = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM producto WHERE codigo = ? AND cantidad >= 1', [req.params.id, req.body.cantidad], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La cantidad ingresada excede el stock del prodcuto'))
             
             resolve(true)
         })
@@ -393,5 +632,22 @@ module.exports = {
     codigoValidacion,
     codigoValidacionSiParams,
     codigoValidacionSiBody,
-    idProveedorValidacionBody
+    idProveedorValidacionBody,
+    idEmpresaValidacionBody,
+    idSolicitudValidacion,
+    idEstadoValidacion,
+    idUsuarioSolicitanteValidacionBody,
+    idAutorizanteValidacion,
+    idSolicitudValidacionBody,
+    idAutorizanteValidacionBody,
+    idContratoValidacion,
+    idUsuarioValidacionBody,
+    idSolicitudUsuarioEmpresaValidacion,
+    idSolicitudUsuarioProveedorValidacion,
+    idCategoriaValidacionBody,
+    idCategoriaValidacion,
+    idEmpleadoValidacionBody,
+    cantidadProductoValidacion,
+    idPedidoValidacionBody,
+    cantidadProductoValidacionCodigoParams
 }

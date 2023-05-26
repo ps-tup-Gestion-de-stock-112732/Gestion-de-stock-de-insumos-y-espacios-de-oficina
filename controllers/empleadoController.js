@@ -27,7 +27,20 @@ const empleadoGet = async (req = request, res = response) =>{
             message: 'Usuario no encontrado'
         })
 
-        res.json(result[0])
+        res.send({
+            idusuario: result[0].idusuario,
+            nombre: result[0].nombre, 
+            apellido: result[0].apellido,
+            nro_documento: result[0].nro_documento, 
+            email: result[0].email,
+            password: null,
+            telefono: result[0].telefono, 
+            idempresa: result[0].idempresa,
+            idrol: result[0].idrol,
+            idarea: result[0].idarea,
+            iddireccion: result[0].iddireccion,
+            estado: result[0].estado
+        })
     } catch (error) {
         return res.status(500).json({
             message: 'Algo salio mal'
