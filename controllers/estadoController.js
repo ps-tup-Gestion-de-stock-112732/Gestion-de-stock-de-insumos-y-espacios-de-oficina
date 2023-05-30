@@ -8,6 +8,14 @@ const estadoGet = async (req, res = response) =>{
     
 }
 
+const estadosGestionGet = async (req, res = response) =>{
+
+    const [results] = await pool.promise().query('SELECT * FROM estadoautorizaciongestion')
+    res.json(results)
+    
+}
+
 module.exports = {
-    estadoGet
+    estadoGet,
+    estadosGestionGet
 }

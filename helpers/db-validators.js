@@ -339,6 +339,20 @@ const idSolicitudValidacion = (value, {req} )=> {
     })
 }
 
+const idSolicitudGestionValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM autorizaciongestion WHERE idautorizacion = ?', [req.params.idautorizacion], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('La solicitud ingresada no existe o no se encuentra en estado pendiente'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idSolicitudUsuarioEmpresaValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM autorizacionusuarioemp WHERE idautorizacion = ? AND idestado = 1', [req.params.id], (err, res)=>{
@@ -649,5 +663,6 @@ module.exports = {
     idEmpleadoValidacionBody,
     cantidadProductoValidacion,
     idPedidoValidacionBody,
-    cantidadProductoValidacionCodigoParams
+    cantidadProductoValidacionCodigoParams,
+    idSolicitudGestionValidacion
 }

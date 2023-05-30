@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { estadoGet } = require('../controllers/estadoController');
+const { estadoGet, estadosGestionGet } = require('../controllers/estadoController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { idEstadoValidacion } = require('../helpers/db-validators');
@@ -13,5 +13,11 @@ routerEstado.get('/:id', [
     validarCampos
     ],
     estadoGet)
+
+routerEstado.get('/gestion/it', [
+    validatJWT
+    ],
+    estadosGestionGet)
+    
 
 module.exports = routerEstado;

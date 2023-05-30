@@ -252,12 +252,20 @@ CREATE TABLE `gestiondb`.`estadoautorizacion` (
   `descripcion` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idestado`));
 
+
+CREATE TABLE `gestiondb`.`estadoautorizaciongestion` (
+  `idestado` INT NOT NULL AUTO_INCREMENT,
+  `descripcion` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`idestado`));
+
+
 CREATE TABLE `gestiondb`.`autorizaciongestion` (
   `idautorizacion` INT NOT NULL AUTO_INCREMENT,
   `idpedido` INT NOT NULL,
   `idestado` INT NOT NULL,
   `fecha` DATETIME NULL,
   `idautorizante` INT NULL,
+  `comentarios` VARCHAR(150) NULL,
   PRIMARY KEY (`idautorizacion`),
   INDEX `autogestion_pedido_fk_idx` (`idpedido` ASC) VISIBLE,
   INDEX `autogestion_estado_fk_idx` (`idestado` ASC) VISIBLE,
@@ -269,38 +277,12 @@ CREATE TABLE `gestiondb`.`autorizaciongestion` (
     ON UPDATE NO ACTION,
   CONSTRAINT `autogestion_estado_fk`
     FOREIGN KEY (`idestado`)
-    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
+    REFERENCES `gestiondb`.`estadoautorizaciongestion` (`idestado`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `autogestion_autorizante_fk`
     FOREIGN KEY (`idautorizante`)
     REFERENCES `gestiondb`.`usuario` (`idusuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
-CREATE TABLE `gestiondb`.`autorizacionxventa` (
-  `idautorizacion` INT NOT NULL AUTO_INCREMENT,
-  `idpedido` INT NOT NULL,
-  `idestado` INT NOT NULL,
-  `fecha` DATETIME NULL,
-  `idautorizante` INT NULL,
-  PRIMARY KEY (`idautorizacion`),
-  INDEX `autoventa_autorizante_fk_idx` (`idautorizante` ASC) VISIBLE,
-  INDEX `autogestion_estado_fk_idx` (`idestado` ASC) VISIBLE,
-  INDEX `autogestion_pedido_fk_idx` (`idpedido` ASC) VISIBLE,
-  CONSTRAINT `autoventa_autorizante_fk`
-    FOREIGN KEY (`idautorizante`)
-    REFERENCES `gestiondb`.`usuario` (`idusuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `autoventa_estado_fk`
-    FOREIGN KEY (`idestado`)
-    REFERENCES `gestiondb`.`estadoautorizacion` (`idestado`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `autoventa_pedido_fk`
-    FOREIGN KEY (`idpedido`)
-    REFERENCES `gestiondb`.`pedido` (`idpedido`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
