@@ -1,6 +1,8 @@
 const { response } = require('express')
 const { pool } =require('../db.js')
 
+const bcryptjs = require('bcryptjs')
+
 const autorizantesGet = async (req = request, res = response) =>{
 
     const {idempresa} = req.body
@@ -67,7 +69,7 @@ const autorizanteXNombreGet = async (req = request, res = response) =>{
 
 const autorizantePost = async (req, res = response) =>{
 
-    const {nombre, apellido, nro_documento, email, password, telefono, idrol} = req.body
+    const {nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol} = req.body
 
     //Encriptar password
     const salt = bcryptjs.genSaltSync()
@@ -76,12 +78,13 @@ const autorizantePost = async (req, res = response) =>{
 
     //Guardar en BD
     try {
-        const [rows] = await pool.promise().query('INSERT INTO usuario (nombre, apellido, nro_documento, email, password, telefono, idrol, estado) VALUES (?,?,?,?,?,?,?,?)', 
-        [nombre, apellido, nro_documento, email, passwordC, telefono, idrol, estado])
+        const [rows] = await pool.promise().query('INSERT INTO usuario (nombre, apellido, idempresa, nro_documento, email, password, telefono, idrol, estado) VALUES (?,?,?,?,?,?,?,?,?)', 
+        [nombre, apellido, idempresa, nro_documento, email, passwordC, telefono, idrol, estado])
         res.send({
             idusuario: rows.insertId,
             nombre, 
             apellido,
+            idempresa,
             nro_documento, 
             email,
             telefono, 

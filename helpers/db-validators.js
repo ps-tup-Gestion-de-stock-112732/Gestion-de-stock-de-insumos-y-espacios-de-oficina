@@ -325,6 +325,38 @@ const idEstadoValidacion = (value, {req} )=> {
     })
 }
 
+const idEstadoGestionValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM estadoautorizaciongestion WHERE idestado = ? ', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('El estado ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idEstadoGestionValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM estadoautorizaciongestion WHERE idestado = ? ', [req.body.estado], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (req.body.estado == 0) {
+                resolve(true)
+            }
+
+            if (res.length == 0) 
+                reject(new Error('El estado ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idSolicitudValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM autorizacionempresa WHERE idautorizacion = ? AND idestado = 1', [req.params.id], (err, res)=>{
@@ -664,5 +696,7 @@ module.exports = {
     cantidadProductoValidacion,
     idPedidoValidacionBody,
     cantidadProductoValidacionCodigoParams,
-    idSolicitudGestionValidacion
+    idSolicitudGestionValidacion,
+    idEstadoGestionValidacionBody,
+    idEstadoGestionValidacion
 }

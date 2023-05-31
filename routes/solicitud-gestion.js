@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { solicitudGestionPost, solicitudesGet, solicitudesFiltroGet, solicitudGet, rechazarSolicitudPut } = require('../controllers/solicitud-gestionController');
+const { solicitudGestionPost, solicitudesGet, solicitudesFiltroGet, solicitudGet, rechazarSolicitudPut, aprobarSolicitudPut, solicitudesXEmpleadoGet, aprobarSolicitudVentasPut } = require('../controllers/solicitud-gestionController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { idPedidoValidacionBody, empresaValidacion, estadoValidacion, idSolicitudGestionValidacion, idAutorizanteValidacionBody } = require('../helpers/db-validators');
+const { idPedidoValidacionBody, empresaValidacion, idEmpleadoValidacion, idSolicitudGestionValidacion, idAutorizanteValidacionBody } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 
 const routerSolicitudGestion = Router();
@@ -24,7 +24,6 @@ routerSolicitudGestion.get('/:idautorizacion', [
 routerSolicitudGestion.post('/all', [
     validatJWT,
     check('idempresa', 'La empresa es obligatoria').notEmpty().custom( empresaValidacion ),
-    check('estado', 'El estado es obligatorio').notEmpty().custom( estadoValidacion ),
     validarCampos
     ],
     solicitudesGet)
@@ -36,6 +35,21 @@ routerSolicitudGestion.post('/filtro', [
     ],
     solicitudesFiltroGet)
 
+routerSolicitudGestion.get('/empleado/:id', [
+    validatJWT,
+    check('id', 'El empleado es obligatorio').notEmpty().custom( idEmpleadoValidacion ),
+    validarCampos
+    ],
+    solicitudesXEmpleadoGet)
+
+routerSolicitudGestion.put('/aprobar/:idautorizacion', [
+    validatJWT,
+    check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
+    check('idautorizante', 'El autorizador es obligatorio').notEmpty().custom( idAutorizanteValidacionBody ),
+    validarCampos
+    ],
+    aprobarSolicitudPut)
+
 routerSolicitudGestion.put('/rechazar/:idautorizacion', [
     validatJWT,
     check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
@@ -43,5 +57,13 @@ routerSolicitudGestion.put('/rechazar/:idautorizacion', [
     validarCampos
     ],
     rechazarSolicitudPut)
+
+routerSolicitudGestion.put('/ventas/aprobar/:idautorizacion', [
+    validatJWT,
+    check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
+    check('idautorizante', 'El autorizador es obligatorio').notEmpty().custom( idAutorizanteValidacionBody ),
+    validarCampos
+    ],
+    aprobarSolicitudVentasPut)
 
 module.exports = routerSolicitudGestion;
