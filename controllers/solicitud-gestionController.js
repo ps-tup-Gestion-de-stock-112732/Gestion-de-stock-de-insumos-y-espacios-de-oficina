@@ -33,12 +33,7 @@ const solicitudGestionPost = async (req, res = response) =>{
 
 const solicitudesGet = async (req, res = response) =>{
 
-    const {idempresa, estado} = req.body
-    let idestado = estado
-
-    if (idestado == 0) {
-        idestado = '1,2,3,4,5'
-    }
+    const {idempresa} = req.body
 
     const [results] = await pool.promise().query(`select a.*, p.idempleado, p.idempresa, p.idproveedor, p.fecha 'fechapedido', dp.idproducto, dp.cantidad, dp.precioUnitario `+
                                                 'from autorizaciongestion a '+
@@ -47,8 +42,8 @@ const solicitudesGet = async (req, res = response) =>{
                                                 'join detallepedido dp '+
                                                 'on p.idpedido = dp.idpedido '+
                                                 'where p.idempresa = ? '+
-                                                'and a.idestado in (?) '+
-                                                'order by a.idestado asc',[idempresa, idestado])
+                                                'and a.idestado in (1,2,3,4,5) '+
+                                                'order by a.idestado asc',[idempresa])
 
     res.json(results)
     
@@ -76,10 +71,6 @@ const solicitudesFiltroGet = async (req, res = response) =>{
     const {idempresa, nombre, estado} = req.body
     let idestado = estado
 
-    if (!estado) {
-    }
-    
-
     const [results] = await pool.promise().query(`select a.*, p.idempleado, p.idempresa, p.idproveedor, p.fecha 'fechapedido', dp.idproducto, dp.cantidad, dp.precioUnitario `+
                                                 'from autorizaciongestion a '+
                                                 'join pedido p '+
@@ -97,6 +88,25 @@ const solicitudesFiltroGet = async (req, res = response) =>{
 }
 
 
+const solicitudesXEmpleadoGet = async (req, res = response) =>{
+
+    const {id} = req.params
+
+    const [results] = await pool.promise().query(`select a.*, p.idempleado, p.idempresa, p.idproveedor, p.fecha 'fechapedido', dp.idproducto, dp.cantidad, dp.precioUnitario `+
+                                                'from autorizaciongestion a '+
+                                                'join pedido p '+
+                                                'on a.idpedido = p.idpedido '+
+                                                'join detallepedido dp '+
+                                                'on p.idpedido = dp.idpedido '+
+                                                'join usuario u '+
+                                                'on p.idempleado = u.idusuario '+
+                                                'where p.idempleado = ?',[id])
+
+    res.json(results)
+    
+}
+
+
 const rechazarSolicitudPut = async (req, res = response) =>{
 
     const {idautorizacion} = req.params
@@ -105,7 +115,7 @@ const rechazarSolicitudPut = async (req, res = response) =>{
 
     try {
         
-        const [result] = await pool.promise().query('UPDATE autorizaciongestion SET idestado = 4, fecha = ?, idautorizante = ?, comentarios = ? WHERE idautorizacion = ? AND idestado = 1', 
+        const [result] = await pool.promise().query('UPDATE autorizaciongestion SET idestado = 4, fecha = ?, idautorizante = ?, comentarios = ? WHERE idautorizacion = ?', 
         [fecha, idautorizante, comentarios, idautorizacion])
 
         if (result.affectedRows <= 0) return res.status(404).json({
@@ -127,10 +137,73 @@ const rechazarSolicitudPut = async (req, res = response) =>{
 
 }
 
+const aprobarSolicitudPut = async (req, res = response) =>{
+
+    const {idautorizacion} = req.params
+    const {idautorizante, comentarios} = req.body
+    const fecha = datetime.datetime()
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE autorizaciongestion SET idestado = 2, fecha = ?, idautorizante = ?, comentarios = ? WHERE idautorizacion = ? AND idestado = 1', 
+        [fecha, idautorizante, comentarios, idautorizacion])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar la solicitud'
+        })
+
+        const solicitud = await pool.promise().query('SELECT * FROM autorizaciongestion WHERE idautorizacion = ?', [idautorizacion])
+        const solicitudAprobada = solicitud[0]
+
+        res.json({
+            solicitudAprobada
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
+const aprobarSolicitudVentasPut = async (req, res = response) =>{
+
+    const {idautorizacion} = req.params
+    const {idautorizante, comentarios} = req.body
+    const fecha = datetime.datetime()
+
+    try {
+        
+        const [result] = await pool.promise().query('UPDATE autorizaciongestion SET idestado = 3, fecha = ?, idautorizante = ?, comentarios = ? WHERE idautorizacion = ? AND idestado = 2', 
+        [fecha, idautorizante, comentarios, idautorizacion])
+
+        if (result.affectedRows <= 0) return res.status(404).json({
+            message: 'No se pudo actualizar la solicitud'
+        })
+
+        const solicitud = await pool.promise().query('SELECT * FROM autorizaciongestion WHERE idautorizacion = ?', [idautorizacion])
+        const solicitudAprobada = solicitud[0]
+
+        res.json({
+            solicitudAprobada
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Algo salio mal'
+        })
+    }
+
+}
+
 module.exports = {
     solicitudGestionPost,
     solicitudesGet,
     solicitudesFiltroGet,
     solicitudGet,
-    rechazarSolicitudPut
+    rechazarSolicitudPut,
+    aprobarSolicitudPut,
+    solicitudesXEmpleadoGet,
+    aprobarSolicitudVentasPut
 }

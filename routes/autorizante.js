@@ -35,6 +35,7 @@ routerAutorizante.post('/', [
     check('password', 'El password debe contener 4 o mas caracteres').isLength({min:4}),
     check('nombre', 'El nombre es obligatorio').notEmpty(),
     check('apellido', 'El apellido es obligatorio').notEmpty(),
+    check('idempresa').optional().custom( empresaValidacion ),
     check('nro_documento', 'El nro_documento debe contener 8 caracteres').isLength({min:8, max:8}).custom( documentoValidacion ),
     check('telefono', 'El telefono debe contener 7 o mas caracteres').isLength({min:7}),
     check('idrol').notEmpty().withMessage('El idrol es obligatorio').custom( rolValidacion ),
