@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const { solicitudGestionPost, solicitudesGet, solicitudesFiltroGet, solicitudGet, rechazarSolicitudPut, aprobarSolicitudPut, solicitudesXEmpleadoGet, aprobarSolicitudVentasPut } = require('../controllers/solicitud-gestionController');
+const { solicitudGestionPost, entregarPedidoPut, enviarPedidoPut, rechazarPedidoPut, solicitudesFiltroProveedorGet, solicitudesXProveedorGet, cancelarSolicitudPut, solicitudesFiltroEstadoGet, solicitudesGet, solicitudesFiltroGet, solicitudGet, rechazarSolicitudPut, aprobarSolicitudPut, solicitudesXEmpleadoGet, aprobarSolicitudVentasPut } = require('../controllers/solicitud-gestionController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { idPedidoValidacionBody, empresaValidacion, idEmpleadoValidacion, idSolicitudGestionValidacion, idAutorizanteValidacionBody } = require('../helpers/db-validators');
+const { idPedidoValidacionBody, empresaValidacion, idEmpleadoValidacion, idSolicitudGestionValidacion, idAutorizanteValidacionBody, idProveedorValidacionBody } = require('../helpers/db-validators');
 const { validatJWT } = require('../middlewares/validar-jwt');
 
 const routerSolicitudGestion = Router();
@@ -28,12 +28,33 @@ routerSolicitudGestion.post('/all', [
     ],
     solicitudesGet)
 
+routerSolicitudGestion.post('/proveedor/all', [
+    validatJWT,
+    check('idProveedor', 'El proveedor es obligatorio').notEmpty().custom( idProveedorValidacionBody ),
+    validarCampos
+    ],
+    solicitudesXProveedorGet)
+
 routerSolicitudGestion.post('/filtro', [
     validatJWT,
     check('idempresa', 'La empresa es obligatoria').notEmpty().custom( empresaValidacion ),
     validarCampos
     ],
     solicitudesFiltroGet)
+
+routerSolicitudGestion.post('/proveedor/filtro', [
+    validatJWT,
+    check('idProveedor', 'El proveedor es obligatorio').notEmpty().custom( idProveedorValidacionBody ),
+    validarCampos
+    ],
+    solicitudesFiltroProveedorGet)
+
+routerSolicitudGestion.post('/filtro/estado', [
+    validatJWT,
+    check('idempresa', 'La empresa es obligatoria').notEmpty().custom( empresaValidacion ),
+    validarCampos
+    ],
+    solicitudesFiltroEstadoGet)
 
 routerSolicitudGestion.get('/empleado/:id', [
     validatJWT,
@@ -58,6 +79,13 @@ routerSolicitudGestion.put('/rechazar/:idautorizacion', [
     ],
     rechazarSolicitudPut)
 
+routerSolicitudGestion.put('/cancelar/:idautorizacion', [
+    validatJWT,
+    check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
+    validarCampos
+    ],
+    cancelarSolicitudPut)
+
 routerSolicitudGestion.put('/ventas/aprobar/:idautorizacion', [
     validatJWT,
     check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
@@ -65,5 +93,30 @@ routerSolicitudGestion.put('/ventas/aprobar/:idautorizacion', [
     validarCampos
     ],
     aprobarSolicitudVentasPut)
+
+
+routerSolicitudGestion.put('/pedido/enviar/:idautorizacion', [
+    validatJWT,
+    check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
+    check('idautorizante', 'El autorizador es obligatorio').notEmpty().custom( idAutorizanteValidacionBody ),
+    validarCampos
+    ],
+    enviarPedidoPut)
+
+routerSolicitudGestion.put('/pedido/rechazar/:idautorizacion', [
+    validatJWT,
+    check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
+    check('idautorizante', 'El autorizador es obligatorio').notEmpty().custom( idAutorizanteValidacionBody ),
+    validarCampos
+    ],
+    rechazarPedidoPut)
+
+routerSolicitudGestion.put('/pedido/entregar/:idautorizacion', [
+    validatJWT,
+    check('idautorizacion', 'El identificador de solicitud es obligatorio').notEmpty().custom( idSolicitudGestionValidacion ),
+    check('idautorizante', 'El autorizador es obligatorio').notEmpty().custom( idAutorizanteValidacionBody ),
+    validarCampos
+    ],
+    entregarPedidoPut)
 
 module.exports = routerSolicitudGestion;
