@@ -266,6 +266,7 @@ CREATE TABLE `gestiondb`.`autorizaciongestion` (
   `fecha` DATETIME NULL,
   `idautorizante` INT NULL,
   `comentarios` VARCHAR(150) NULL,
+  `idoperacion` INT NULL,
   PRIMARY KEY (`idautorizacion`),
   INDEX `autogestion_pedido_fk_idx` (`idpedido` ASC) VISIBLE,
   INDEX `autogestion_estado_fk_idx` (`idestado` ASC) VISIBLE,
@@ -407,7 +408,54 @@ CREATE TABLE `gestiondb`.`autorizacionusuarioprov` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+CREATE TABLE `gestiondb`.`oficina` (
+  `idoficina` INT NOT NULL AUTO_INCREMENT,
+  `nombreoficina` VARCHAR(45) NOT NULL,
+  `idempresa` INT NOT NULL,
+  `cantidadfilas` INT NOT NULL,
+  `cantidadcolumnas` INT NOT NULL,
+  `idestado` INT NOT NULL,
+  PRIMARY KEY (`idoficina`),
+  INDEX `oficina_empresa_fk_idx` (`idempresa` ASC) VISIBLE,
+  INDEX `oficina_estado_fk_idx` (`idestado` ASC) VISIBLE,
+  CONSTRAINT `oficina_empresa_fk`
+    FOREIGN KEY (`idempresa`)
+    REFERENCES `gestiondb`.`empresa` (`idempresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `oficina_estado_fk`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadousuario` (`idestadoUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
+CREATE TABLE `gestiondb`.`espacioreservado` (
+  `idespacio` INT NOT NULL AUTO_INCREMENT,
+  `idoficina` INT NOT NULL,
+  `fila` INT NOT NULL,
+  `columna` INT NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  `idempleado` INT NOT NULL,
+  `idestado` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`idespacio`),
+  INDEX `espacio_oficina_fk_idx` (`idoficina` ASC) VISIBLE,
+  INDEX `espacio_empleado_fk_idx` (`idempleado` ASC) VISIBLE,
+  INDEX `espacio_estado_fk_idx` (`idestado` ASC) VISIBLE,
+  CONSTRAINT `espacio_oficina_fk`
+    FOREIGN KEY (`idoficina`)
+    REFERENCES `gestiondb`.`oficina` (`idoficina`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `espacio_empleado_fk`
+    FOREIGN KEY (`idempleado`)
+    REFERENCES `gestiondb`.`usuario` (`idusuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `espacio_estado_fk`
+    FOREIGN KEY (`idestado`)
+    REFERENCES `gestiondb`.`estadousuario` (`idestadoUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 
@@ -418,6 +466,16 @@ INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES 
 INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('2', 'Aprobado');
 INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('3', 'Rechazado');
 INSERT INTO `gestiondb`.`estadoautorizacion` (`idestado`, `descripcion`) VALUES ('4', 'Cancelado');
+
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('1', 'Pendiente Gestion');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('2', 'Pendiente Ventas');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('3', 'Aprobado');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('4', 'Rechazado');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('5', 'Cancelado');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('6', 'Enviado');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('7', 'Entregado');
+INSERT INTO `gestiondb`.`estadoautorizaciongestion` (`idestado`, `descripcion`) VALUES ('8', 'Rechazado Proveedor');
+
 
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('1', 'empresa');
 INSERT INTO `gestiondb`.`rol` (`idrol`, `nombre`) VALUES ('2', 'gestion it');
