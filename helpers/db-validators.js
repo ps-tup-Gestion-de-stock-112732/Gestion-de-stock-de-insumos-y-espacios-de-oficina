@@ -325,6 +325,48 @@ const idEstadoValidacion = (value, {req} )=> {
     })
 }
 
+const idOficinaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM oficina WHERE idoficina = ? ', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('la oficina ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idEspacioValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM espacioreservado WHERE idespacio = ? ', [req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('el espacio ingresado no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const idOficinaValidacionBody = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM oficina WHERE idoficina = ? ', [req.body.idoficina], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length == 0) 
+                reject(new Error('la oficina ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
 const idEstadoGestionValidacion = (value, {req} )=> {
     return new Promise((resolve, reject) => {
         pool.query('SELECT * FROM estadoautorizaciongestion WHERE idestado = ? ', [req.params.id], (err, res)=>{
@@ -436,6 +478,34 @@ const idEmpresaValidacionBody = (value, {req} )=> {
 
             if (res.length == 0) 
                 reject(new Error('La empresa ingresada no existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const nombreOficinaValidacion = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM oficina WHERE idempresa = ? AND nombreoficina = ? AND idestado = 1', [req.body.idempresa, req.body.nombreoficina], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length > 0) 
+                reject(new Error('La oficina ingresada ya existe'))
+            
+            resolve(true)
+        })
+    })
+}
+
+const nombreOficinaValidacionUpdate = (value, {req} )=> {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM oficina WHERE idempresa = ? AND nombreoficina = ? AND idoficina != ?', [req.params.idempresa, req.body.nombreoficina, req.params.id], (err, res)=>{
+            if (err) 
+                reject(new Error('Server error'))
+
+            if (res.length > 0) 
+                reject(new Error('La oficina ingresada ya existe'))
             
             resolve(true)
         })
@@ -698,5 +768,10 @@ module.exports = {
     cantidadProductoValidacionCodigoParams,
     idSolicitudGestionValidacion,
     idEstadoGestionValidacionBody,
-    idEstadoGestionValidacion
+    idEstadoGestionValidacion,
+    idOficinaValidacion,
+    nombreOficinaValidacion,
+    nombreOficinaValidacionUpdate,
+    idOficinaValidacionBody,
+    idEspacioValidacion
 }
