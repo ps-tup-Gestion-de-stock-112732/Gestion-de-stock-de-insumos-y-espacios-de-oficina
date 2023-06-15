@@ -415,6 +415,7 @@ CREATE TABLE `gestiondb`.`oficina` (
   `cantidadfilas` INT NOT NULL,
   `cantidadcolumnas` INT NOT NULL,
   `idestado` INT NOT NULL,
+  `fechabaja` DATETIME NULL,
   PRIMARY KEY (`idoficina`),
   INDEX `oficina_empresa_fk_idx` (`idempresa` ASC) VISIBLE,
   INDEX `oficina_estado_fk_idx` (`idestado` ASC) VISIBLE,

@@ -24,6 +24,7 @@ class Server{
         this.pedidoPath = '/api/pedidos';
         this.solicitudGestionPath = '/api/solicitud-gestion';
         this.oficinaGestionPath = '/api/oficinas';
+        this.reportesPath = '/api/reportes';
         
         //Middlewares
         this.middlewares();
@@ -67,6 +68,7 @@ class Server{
         this.app.use(this.pedidoPath, require('../routes/pedido'))
         this.app.use(this.solicitudGestionPath, require('../routes/solicitud-gestion'))
         this.app.use(this.oficinaGestionPath, require('../routes/oficinas'))
+        this.app.use(this.reportesPath, require('../routes/reportes'))
 
         this.app.use((req, res, next)=>{
             res.status(404).json({

@@ -3,7 +3,7 @@ const { pool } =require('../db.js')
 
 const productosGet = async (req = request, res = response) =>{
 
-    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ? AND cantidad > 0',[req.body.idempresa])
+    const [results] = await pool.promise().query('SELECT * FROM producto WHERE estado = 1 AND idProveedor = ?',[req.body.idempresa])
     res.json(results)
 }
 
