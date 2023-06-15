@@ -1,5 +1,6 @@
 const { response } = require('express')
 const { pool } =require('../db.js')
+
 var datetime = require('../helpers/datetime.js')
 
 const oficinaGet = async (req, res = response) =>{
@@ -70,10 +71,12 @@ const oficinaDelete = async (req, res = response) =>{
 
     const id = req.params.id
 
+    const fecha = datetime.datetime()
+
     try {
         
-        const [result] = await pool.promise().query('UPDATE oficina SET idestado = 0 WHERE idoficina = ?', 
-        [id])
+        const [result] = await pool.promise().query('UPDATE oficina SET idestado = 0, fechabaja = ? WHERE idoficina = ?', 
+        [fecha, id])
 
         if (result.affectedRows <= 0) return res.status(404).json({
             message: 'No se pudo actualizar la oficina'
@@ -111,7 +114,10 @@ const oficinaEspaciosEmpleadoGet = async (req, res = response) =>{
 
     const fecha = datetime.datetimeshort()
 
-    const [results] = await pool.promise().query('SELECT * FROM espacioreservado WHERE idempleado = ? AND idestado = 1 AND fecha >= ? ORDER BY fecha ASC',[req.params.id, fecha])
+    const [results] = await pool.promise().query('SELECT * FROM espacioreservado WHERE idempleado = ? AND idestado = 1 AND fecha >= ? AND idoficina in ('+
+                                                    'SELECT idoficina FROM oficina '+
+                                                    'WHERE idestado = 1'+
+                                                ') ORDER BY fecha ASC',[req.params.id, fecha])
     res.json(results)
     
 }

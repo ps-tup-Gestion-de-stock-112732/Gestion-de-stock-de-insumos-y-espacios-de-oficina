@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { solicitudGestionPost, entregarPedidoPut, enviarPedidoPut, rechazarPedidoPut, solicitudesFiltroProveedorGet, solicitudesXProveedorGet, cancelarSolicitudPut, solicitudesFiltroEstadoGet, solicitudesGet, solicitudesFiltroGet, solicitudGet, rechazarSolicitudPut, aprobarSolicitudPut, solicitudesXEmpleadoGet, aprobarSolicitudVentasPut } = require('../controllers/solicitud-gestionController');
+const { solicitudGestionPost, entregarPedidoPut, enviarPedidoPut, rechazarPedidoPut, solicitudesFiltroProveedorGet, solicitudesXProveedorGet, cancelarSolicitudPut, solicitudesFiltroEstadoGet, solicitudesGet, solicitudesFiltroGet, solicitudGet, rechazarSolicitudPut, aprobarSolicitudPut, solicitudesEmpresasProveedorGet, solicitudesXEmpleadoGet, aprobarSolicitudVentasPut } = require('../controllers/solicitud-gestionController');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { idPedidoValidacionBody, empresaValidacion, idEmpleadoValidacion, idSolicitudGestionValidacion, idAutorizanteValidacionBody, idProveedorValidacionBody } = require('../helpers/db-validators');
@@ -48,6 +48,11 @@ routerSolicitudGestion.post('/proveedor/filtro', [
     validarCampos
     ],
     solicitudesFiltroProveedorGet)
+
+
+routerSolicitudGestion.get('/proveedor/empresas/:idproveedor', [validatJWT],
+    solicitudesEmpresasProveedorGet)
+    
 
 routerSolicitudGestion.post('/filtro/estado', [
     validatJWT,
